@@ -1,13 +1,13 @@
 # Bug Tracker
 
-A modern, project-based bug tracking application for teams, similar to Jira. This application features a clean, intuitive Kanban-style board and leverages the Gemini API to assist in writing detailed, structured bug reports.
+A modern, project-based bug tracking application for teams, similar to Jira. This application features a clean, intuitive Kanban-style board and can leverage the Gemini API to assist in writing detailed, structured bug reports.
 
 ## Features
 
 - **Project-Based Organization**: Group your issues by project. Easily switch between projects via a dropdown menu.
 - **Kanban Board**: Visualize your workflow with a drag-and-drop board for "To Do", "In Progress", and "Done" statuses.
 - **Issue Management**: Create, view, edit, and delete issues through a comprehensive modal.
-- **AI-Powered Descriptions**: Use the Gemini API to automatically generate detailed bug descriptions based on a simple title, including summary, steps to reproduce, and expected/actual results.
+- **AI-Powered Descriptions (Optional)**: If you provide a Gemini API key, you can automatically generate detailed bug descriptions based on a simple title, including summary, steps to reproduce, and expected/actual results.
 - **User Assignments**: Assign issues to team members.
 - **Priority Levels**: Set priorities for issues (Low, Medium, High, Urgent).
 - **Project Creation**: Quickly add new projects on the fly.
@@ -18,7 +18,7 @@ A modern, project-based bug tracking application for teams, similar to Jira. Thi
 
 - **Frontend**: React, TypeScript
 - **Styling**: Tailwind CSS
-- **AI**: Google Gemini API
+- **AI**: Google Gemini API (Optional)
 - **Build**: Vite (or similar modern build tool)
 
 ## Getting Started
@@ -26,7 +26,7 @@ A modern, project-based bug tracking application for teams, similar to Jira. Thi
 ### Prerequisites
 
 - A modern web browser.
-- An API key for the Google Gemini API.
+- An API key for the Google Gemini API (**optional**).
 
 ### Installation & Running
 
@@ -42,10 +42,12 @@ A modern, project-based bug tracking application for teams, similar to Jira. Thi
     ```bash
     npm install
     ```
-4.  Create a `.env` file in the root directory and add your Gemini API key:
+4.  **(Optional)** Create a `.env` file in the root directory and add your Gemini API key to enable AI features:
     ```
     VITE_GEMINI_API_KEY=your_api_key_here
     ```
+    If you skip this step, the application will still work, but the AI-powered issue description generation will be disabled.
+
 5.  Start the development server:
     ```bash
     npm run dev
@@ -94,4 +96,4 @@ The application now includes a login and signup page.
 
 -   **State Management**: The main `App.tsx` component manages the state for projects, issues, users, and the currently selected project using React's `useState` hook.
 -   **Drag and Drop**: Native HTML drag-and-drop APIs are used to move issues between columns. The `onDragStart` and `onDrop` event handlers update the issue's status in the state.
--   **Gemini Integration**: When a user clicks the "Generate with AI" button in the `IssueModal`, the `geminiService.ts` sends the issue title to the Gemini API. The API returns a structured markdown description, which is then populated into the form.
+-   **Gemini Integration (Optional)**: If a Gemini API key is provided in the environment, a "Generate with AI" button becomes available in the issue creation modal. When clicked, `geminiService.ts` sends the issue title to the Gemini API. The API returns a structured markdown description, which is then populated into the form. If no API key is present, this feature is gracefully disabled.

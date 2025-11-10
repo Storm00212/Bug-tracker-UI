@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Issue, User, Status, Priority } from '../types';
 import { PRIORITIES } from '../constants';
-import { generateIssueDescription } from '../services/geminiService';
+import { generateIssueDescription, isAiEnabled } from '../services/geminiService';
 
 interface IssueModalProps {
   isOpen: boolean;
@@ -89,8 +89,9 @@ const IssueModal: React.FC<IssueModalProps> = ({ isOpen, onClose, issue, users, 
                 <label className="block text-sm font-medium text-neutral-dark">Description</label>
                 <button 
                   onClick={handleGenerateDescription}
-                  disabled={isGenerating}
+                  disabled={isGenerating || !isAiEnabled}
                   className="flex items-center text-sm text-brand-primary font-semibold hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
+                  title={!isAiEnabled ? "AI feature is not configured. Please provide an API key." : "Generate description using AI"}
                 >
                     {isGenerating ? (
                         <>
