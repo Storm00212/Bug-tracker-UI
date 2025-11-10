@@ -1,158 +1,180 @@
-import React, { useState, useCallback } from 'react';
-import { Issue, User, Status, Project } from './types';
-import { MOCK_ISSUES, MOCK_USERS, MOCK_PROJECTS, STATUSES } from './constants';
+import React, { useState, useEffect } from 'react';
+import { DUMMY_USERS, DUMMY_PROJECTS, DUMMY_ISSUES } from './constants';
+import { Project, Issue, User, Status } from './types';
 import Column from './components/Column';
 import IssueModal from './components/IssueModal';
 import ProjectModal from './components/ProjectModal';
+import AuthPage from './components/AuthPage';
 
 const App: React.FC = () => {
-  const [projects, setProjects] = useState<Project[]>(MOCK_PROJECTS);
-  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(MOCK_PROJECTS[0]?.id || null);
-  const [issues, setIssues] = useState<Issue[]>(MOCK_ISSUES);
-  const [users] = useState<User[]>(MOCK_USERS);
-  
-  const [isIssueModalOpen, setIsIssueModalOpen] = useState(false);
-  const [isProjectModalOpen, setIsProjectModalOpen] = useState(false);
-  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [issues, setIssues] = useState<Issue[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
 
+  const [isIssueModalOpen, setIssueModalOpen] = useState(false);
+  const [isProjectModalOpen, setProjectModalOpen] = useState(false);
+  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
+  
+  // Load initial data
+  useEffect(() => {
+    // In a real app, this would be an API call
+    setProjects(DUMMY_PROJECTS);
+    setIssues(DUMMY_ISSUES);
+    setUsers(DUMMY_USERS);
+    if (DUMMY_PROJECTS.length > 0) {
+      setSelectedProject(DUMMY_PROJECTS[0]);
+    }
+  }, []);
+
+  const handleLogin = (user: User) => {
+    setCurrentUser(user);
+  };
+
+  const handleSignup = (newUser: User) => {
+    setUsers(prev => [...prev, newUser]);
+    setCurrentUser(newUser);
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+  };
+  
   const handleSelectIssue = (issue: Issue) => {
     setSelectedIssue(issue);
-    setIsIssueModalOpen(true);
+    setIssueModalOpen(true);
+  };
+
+  const handleCloseIssueModal = () => {
+    setIssueModalOpen(false);
+    setSelectedIssue(null);
   };
   
-  const handleOpenCreateIssueModal = () => {
-    if (!selectedProjectId) {
-      alert("Please select a project before creating an issue.");
-      return;
-    }
-    setSelectedIssue(null);
-    setIsIssueModalOpen(true);
-  }
-
-  const handleCloseModal = () => {
-    setIsIssueModalOpen(false);
-    setIsProjectModalOpen(false);
-    setSelectedIssue(null);
-  };
-
   const handleSaveIssue = (issueToSave: Issue) => {
-    const issueExists = issues.some(i => i.id === issueToSave.id);
-    if (issueExists) {
-      setIssues(issues.map(i => i.id === issueToSave.id ? issueToSave : i));
+    const issueIndex = issues.findIndex(i => i.id === issueToSave.id);
+    if (issueIndex > -1) {
+      const newIssues = [...issues];
+      newIssues[issueIndex] = issueToSave;
+      setIssues(newIssues);
     } else {
       setIssues([...issues, issueToSave]);
     }
-    handleCloseModal();
+    handleCloseIssueModal();
   };
-  
+
   const handleDeleteIssue = (issueId: string) => {
     setIssues(issues.filter(i => i.id !== issueId));
-    handleCloseModal();
-  }
+    handleCloseIssueModal();
+  };
 
   const handleSaveProject = (projectToSave: Project) => {
     setProjects([...projects, projectToSave]);
-    setSelectedProjectId(projectToSave.id);
-    handleCloseModal();
-  }
-
-  const onDragStart = (e: React.DragEvent<HTMLDivElement>, issueId: string) => {
-    e.dataTransfer.setData('issueId', issueId);
+    if (!selectedProject) {
+        setSelectedProject(projectToSave);
+    }
+    setProjectModalOpen(false);
   };
 
-  const onDrop = (e: React.DragEvent<HTMLDivElement>, newStatus: Status) => {
-    e.preventDefault();
-    const issueId = e.dataTransfer.getData('issueId');
-    setIssues(prevIssues =>
-      prevIssues.map(issue =>
-        issue.id === issueId ? { ...issue, status: newStatus } : issue
-      )
-    );
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, issueId: string) => {
+    e.dataTransfer.setData("issueId", issueId);
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>, status: Status) => {
+    const issueId = e.dataTransfer.getData("issueId");
+    const newIssues = issues.map(issue => {
+      if (issue.id === issueId) {
+        return { ...issue, status };
+      }
+      return issue;
+    });
+    setIssues(newIssues);
   };
   
-  const getFilteredIssuesByStatus = useCallback((status: Status) => {
-    if (!selectedProjectId) return [];
-    return issues.filter(issue => issue.projectId === selectedProjectId && issue.status === status);
-  }, [issues, selectedProjectId]);
+  const filteredIssues = selectedProject
+    ? issues.filter(issue => issue.projectId === selectedProject.id)
+    : [];
+
+  const issuesByStatus = {
+    [Status.TODO]: filteredIssues.filter(i => i.status === Status.TODO),
+    [Status.IN_PROGRESS]: filteredIssues.filter(i => i.status === Status.IN_PROGRESS),
+    [Status.DONE]: filteredIssues.filter(i => i.status === Status.DONE),
+  };
+
+  if (!currentUser) {
+    return <AuthPage users={users} onLogin={handleLogin} onSignup={handleSignup} />;
+  }
 
   return (
-    <div className="flex flex-col h-screen bg-neutral-light font-sans text-neutral-darkest">
-      <header className="bg-white shadow-md p-4 flex justify-between items-center z-10 flex-shrink-0">
-        <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
-                <svg className="w-8 h-8 text-brand-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                <h1 className="text-2xl font-bold">Bug Tracker</h1>
-            </div>
-            <div className="flex items-center space-x-2">
-                <select 
-                    value={selectedProjectId || ''} 
-                    onChange={e => setSelectedProjectId(e.target.value)}
-                    className="border-neutral-medium rounded-md shadow-sm focus:ring-brand-primary focus:border-brand-primary font-semibold"
-                >
-                    {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </select>
-                <button 
-                  onClick={() => setIsProjectModalOpen(true)}
-                  className="bg-neutral-dark text-white font-semibold px-3 py-2 text-sm rounded-lg hover:bg-neutral-darkest transition-colors flex items-center"
-                >
-                  <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                  New Project
-                </button>
-            </div>
+    <div className="bg-neutral-lightest min-h-screen font-sans text-neutral-darkest">
+      <header className="bg-white shadow-sm p-4 flex justify-between items-center">
+        <div className="flex items-center gap-4">
+            <h1 className="text-xl font-bold text-brand-primary">Bug Tracker</h1>
+            <select 
+              value={selectedProject?.id || ''} 
+              onChange={(e) => setSelectedProject(projects.find(p => p.id === e.target.value) || null)}
+              className="border-neutral-medium rounded-md shadow-sm focus:ring-brand-primary focus:border-brand-primary"
+            >
+              {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+            <button onClick={() => setProjectModalOpen(true)} className="text-sm text-brand-primary font-semibold hover:underline">
+              New Project
+            </button>
         </div>
-        <button 
-          onClick={handleOpenCreateIssueModal}
-          className="bg-brand-primary text-white font-semibold px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors flex items-center"
-          disabled={!selectedProjectId}
-        >
-          <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-          New Issue
-        </button>
+        <div className="flex items-center gap-4">
+          <div className="text-right">
+            <p className="font-semibold text-sm">{currentUser.name}</p>
+            <button onClick={handleLogout} className="text-xs text-neutral-dark hover:underline">Logout</button>
+          </div>
+          <button onClick={() => { setSelectedIssue(null); setIssueModalOpen(true); }} className="px-4 py-2 bg-brand-primary text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors">
+            + New Issue
+          </button>
+        </div>
       </header>
-      <main className="flex-grow p-4 md:p-6 lg:p-8 overflow-x-auto">
-        {selectedProjectId ? (
-          <div className="flex space-x-6 h-full min-w-max">
-            {STATUSES.map(status => (
+
+      <main className="p-4 md:p-6 lg:p-8">
+        {selectedProject ? (
+          <div className="flex flex-col md:flex-row gap-6">
+            {Object.values(Status).map(status => (
               <Column
                 key={status}
                 status={status}
-                issues={getFilteredIssuesByStatus(status)}
+                issues={issuesByStatus[status]}
                 users={users}
                 onSelectIssue={handleSelectIssue}
-                onDragStart={onDragStart}
-                onDrop={onDrop}
+                onDragStart={handleDragStart}
+                onDrop={handleDrop}
               />
             ))}
           </div>
         ) : (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <h2 className="text-2xl font-semibold text-neutral-dark">No Project Selected</h2>
-              <p className="mt-2 text-neutral-darkest">Please select a project from the dropdown or create a new one to get started.</p>
-            </div>
+          <div className="text-center py-10">
+            <h2 className="text-2xl font-semibold mb-2">No project selected</h2>
+            <p className="text-neutral-dark mb-4">Please select a project from the dropdown or create a new one.</p>
+            <button onClick={() => setProjectModalOpen(true)} className="px-4 py-2 bg-brand-primary text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors">
+              Create a Project
+            </button>
           </div>
         )}
       </main>
-      
-      {isIssueModalOpen && selectedProjectId && (
-        <IssueModal
-            isOpen={isIssueModalOpen}
-            onClose={handleCloseModal}
-            issue={selectedIssue}
-            users={users}
-            onSave={handleSaveIssue}
-            onDelete={handleDeleteIssue}
-            projectId={selectedProjectId}
-        />
-      )}
-      
-      <ProjectModal 
+
+      <IssueModal
+        isOpen={isIssueModalOpen}
+        onClose={handleCloseIssueModal}
+        issue={selectedIssue}
+        users={users}
+        onSave={handleSaveIssue}
+        onDelete={handleDeleteIssue}
+        projectId={selectedProject?.id || ''}
+      />
+
+      <ProjectModal
         isOpen={isProjectModalOpen}
-        onClose={handleCloseModal}
+        onClose={() => setProjectModalOpen(false)}
         onSave={handleSaveProject}
       />
     </div>
   );
-};
+}
 
 export default App;
