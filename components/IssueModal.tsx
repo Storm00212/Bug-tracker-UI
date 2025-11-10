@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Issue, User, Status, Priority } from '../types';
 import { PRIORITIES } from '../constants';
-import { generateIssueDescription, isAiEnabled } from '../services/geminiService';
 
 interface IssueModalProps {
   isOpen: boolean;
@@ -15,7 +14,6 @@ interface IssueModalProps {
 
 const IssueModal: React.FC<IssueModalProps> = ({ isOpen, onClose, issue, users, onSave, onDelete, projectId }) => {
   const [editableIssue, setEditableIssue] = useState<Partial<Issue>>({});
-  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     if (issue) {
@@ -49,22 +47,6 @@ const IssueModal: React.FC<IssueModalProps> = ({ isOpen, onClose, issue, users, 
       onDelete(issue.id);
     }
   };
-  
-  const handleGenerateDescription = useCallback(async () => {
-    if (!editableIssue.title) {
-        alert("Please enter a title first to generate a description.");
-        return;
-    }
-    setIsGenerating(true);
-    try {
-        const description = await generateIssueDescription(editableIssue.title);
-        setEditableIssue(prev => ({ ...prev, description }));
-    } catch (error) {
-        console.error("Failed to generate description:", error);
-    } finally {
-        setIsGenerating(false);
-    }
-  }, [editableIssue.title]);
 
   if (!isOpen) return null;
 
@@ -85,30 +67,7 @@ const IssueModal: React.FC<IssueModalProps> = ({ isOpen, onClose, issue, users, 
           </div>
 
           <div>
-            <div className="flex justify-between items-center mb-1">
-                <label className="block text-sm font-medium text-neutral-dark">Description</label>
-                <button 
-                  onClick={handleGenerateDescription}
-                  disabled={isGenerating || !isAiEnabled}
-                  className="flex items-center text-sm text-brand-primary font-semibold hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
-                  title={!isAiEnabled ? "AI feature is not configured. Please provide an API key." : "Generate description using AI"}
-                >
-                    {isGenerating ? (
-                        <>
-                            <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-brand-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            Generating...
-                        </>
-                    ) : (
-                        <>
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" /></svg>
-                            Generate with AI
-                        </>
-                    )}
-                </button>
-            </div>
+            <label className="block text-sm font-medium text-neutral-dark mb-1">Description</label>
             <textarea name="description" value={editableIssue.description || ''} onChange={handleChange} rows={6} className="w-full border-neutral-medium rounded-md shadow-sm focus:ring-brand-primary focus:border-brand-primary"></textarea>
           </div>
 
