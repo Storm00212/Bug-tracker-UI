@@ -1,0 +1,5 @@
+{
+  "name": "Bug Tracker",
+  "description": "A project-based bug tracking application for teams, similar to Jira, with AI-powered features to assist in writing detailed bug reports. Users can manage issues within specific projects on a Kanban-style board.",
+  "requestFramePermissions": []
+}
