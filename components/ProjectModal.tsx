@@ -29,42 +29,44 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave }) 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center" onClick={onClose}>
-      <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-lg" onClick={e => e.stopPropagation()}>
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-neutral-darkest">Create New Project</h2>
-          <button onClick={onClose} className="text-neutral-medium hover:text-neutral-darkest transition-colors">
+    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex justify-center items-center" onClick={onClose}>
+      <div className="bg-surface border border-border rounded-xl shadow-2xl p-0 w-full max-w-lg overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div className="p-6 border-b border-border bg-surface-highlight flex justify-between items-center">
+            <h2 className="text-xl font-bold font-mono text-primary">> INIT_PROJECT</h2>
+          <button onClick={onClose} className="text-text-muted hover:text-white transition-colors">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
         </div>
-        <div className="space-y-6">
+        
+        <div className="p-8 space-y-6 bg-surface">
           <div>
-            <label className="block text-sm font-medium text-neutral-dark mb-1">Project Name</label>
+            <label className="block text-xs font-mono font-bold text-primary mb-2 uppercase tracking-wider">Project Name</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full border-neutral-medium rounded-md shadow-sm focus:ring-brand-primary focus:border-brand-primary"
-              placeholder="e.g., Q4 Marketing Campaign"
+              className="w-full bg-background border border-border rounded p-3 text-text-main focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder-gray-600"
+              placeholder="e.g., Q4_Marketing_Campaign"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-neutral-dark mb-1">Description</label>
+            <label className="block text-xs font-mono font-bold text-primary mb-2 uppercase tracking-wider">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
-              className="w-full border-neutral-medium rounded-md shadow-sm focus:ring-brand-primary focus:border-brand-primary"
-              placeholder="A brief summary of what this project is about."
+              className="w-full bg-background border border-border rounded p-3 text-text-main font-mono text-sm focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all placeholder-gray-600"
+              placeholder="Brief summary..."
             ></textarea>
           </div>
         </div>
-        <div className="mt-8 flex justify-end gap-4">
-          <button onClick={onClose} className="px-4 py-2 bg-neutral-light text-neutral-darkest font-semibold rounded-md hover:bg-neutral-medium transition-colors">
-            Cancel
+        
+        <div className="p-6 border-t border-border bg-surface-highlight flex justify-end gap-4">
+          <button onClick={onClose} className="px-4 py-2 text-text-muted hover:text-white transition-colors font-mono text-sm">
+            CANCEL
           </button>
-          <button onClick={handleSave} className="px-4 py-2 bg-brand-primary text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors">
-            Create Project
+          <button onClick={handleSave} className="px-6 py-2 bg-primary hover:bg-primary-dark text-background font-bold rounded shadow-glow transition-all font-mono text-sm">
+            CREATE_PROJECT
           </button>
         </div>
       </div>

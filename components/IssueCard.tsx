@@ -16,13 +16,25 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, assignee, onSelectIssue, o
       draggable
       onDragStart={(e) => onDragStart(e, issue.id)}
       onClick={() => onSelectIssue(issue)}
-      className="bg-white rounded-lg p-3.5 mb-3 shadow-sm hover:shadow-md cursor-pointer transition-shadow duration-200 border border-neutral-medium/50"
+      className="group bg-surface-highlight hover:bg-[#252b3b] border border-border hover:border-primary/50 rounded-lg p-4 shadow-sm hover:shadow-glow transition-all duration-200 cursor-grab active:cursor-grabbing relative overflow-hidden"
     >
-      <p className="font-medium text-neutral-darkest mb-2">{issue.title}</p>
-      <div className="flex justify-between items-center">
-        <div className="flex items-center space-x-1">
-          <PriorityIcon priority={issue.priority} />
-          <span className="text-xs text-neutral-dark font-semibold">{issue.id.split('-')[0]}</span>
+      <div className="absolute left-0 top-0 bottom-0 w-1 bg-transparent group-hover:bg-primary transition-colors"></div>
+      
+      <div className="flex justify-between items-start mb-2">
+        <span className="text-[10px] font-mono text-text-muted bg-background px-1.5 py-0.5 rounded border border-border">
+          {issue.id}
+        </span>
+        <PriorityIcon priority={issue.priority} />
+      </div>
+      
+      <p className="font-medium text-text-main text-sm mb-3 line-clamp-2 leading-snug group-hover:text-primary transition-colors">
+        {issue.title}
+      </p>
+      
+      <div className="flex justify-between items-end border-t border-border pt-3 mt-1">
+        <div className="flex flex-col">
+            <span className="text-[10px] text-text-muted uppercase font-bold tracking-wider">Project</span>
+            <span className="text-xs text-text-muted font-mono">{issue.projectId.split('-')[1]}</span>
         </div>
         <UserAvatar user={assignee} size="sm" />
       </div>

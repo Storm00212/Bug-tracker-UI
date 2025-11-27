@@ -4,19 +4,37 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bug Tracker</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              'brand-primary': '#4f46e5',
-              'brand-secondary': '#10b981',
-              'neutral-light': '#f3f4f6',
-              'neutral-medium': '#d1d5db',
-              'neutral-dark': '#374151',
-              'neutral-darkest': '#1f2937',
+              background: '#0B0E14',
+              surface: '#151921',
+              'surface-highlight': '#1E232F',
+              primary: '#00D1FF',
+              'primary-dark': '#009DC0',
+              secondary: '#7000FF',
+              accent: '#00FF94',
+              'text-main': '#E2E8F0',
+              'text-muted': '#94A3B8',
+              border: '#2D3748',
             },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['"JetBrains Mono"', 'monospace'],
+            },
+            boxShadow: {
+              'glow': '0 0 15px rgba(0, 209, 255, 0.15)',
+              'glow-accent': '0 0 15px rgba(0, 255, 148, 0.15)',
+            }
           },
         },
       }
@@ -32,7 +50,7 @@
 }
 </script>
 </head>
-  <body class="bg-neutral-light">
+  <body class="bg-background text-text-main selection:bg-primary selection:text-background">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

@@ -106,35 +106,49 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="bg-neutral-lightest min-h-screen font-sans text-neutral-darkest">
-      <header className="bg-white shadow-sm p-4 flex justify-between items-center">
-        <div className="flex items-center gap-4">
-            <h1 className="text-xl font-bold text-brand-primary">Bug Tracker</h1>
-            <select 
-              value={selectedProject?.id || ''} 
-              onChange={(e) => setSelectedProject(projects.find(p => p.id === e.target.value) || null)}
-              className="border-neutral-medium rounded-md shadow-sm focus:ring-brand-primary focus:border-brand-primary"
-            >
-              {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
-            </select>
-            <button onClick={() => setProjectModalOpen(true)} className="text-sm text-brand-primary font-semibold hover:underline">
-              New Project
+    <div className="bg-background min-h-screen font-sans text-text-main flex flex-col">
+      <header className="bg-surface border-b border-border p-4 flex justify-between items-center sticky top-0 z-10 backdrop-blur-sm bg-surface/90">
+        <div className="flex items-center gap-6">
+            <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center font-mono font-bold text-white text-lg">
+                    BT
+                </div>
+                <h1 className="text-xl font-bold font-mono tracking-tight">Bug_Tracker<span className="text-primary">.exe</span></h1>
+            </div>
+            
+            <div className="hidden md:flex items-center bg-surface-highlight border border-border rounded-md px-3 py-1">
+                <span className="text-text-muted text-xs font-mono mr-2">PROJECT:</span>
+                <select 
+                value={selectedProject?.id || ''} 
+                onChange={(e) => setSelectedProject(projects.find(p => p.id === e.target.value) || null)}
+                className="bg-transparent border-none text-sm font-semibold focus:ring-0 text-text-main cursor-pointer outline-none min-w-[150px]"
+                >
+                {projects.map(p => <option key={p.id} value={p.id} className="bg-surface">{p.name}</option>)}
+                </select>
+            </div>
+
+            <button onClick={() => setProjectModalOpen(true)} className="text-xs font-mono text-primary hover:text-accent transition-colors border border-primary/30 hover:border-accent/50 rounded px-2 py-1">
+              + NEW_PROJECT
             </button>
         </div>
+        
         <div className="flex items-center gap-4">
-          <div className="text-right">
-            <p className="font-semibold text-sm">{currentUser.name}</p>
-            <button onClick={handleLogout} className="text-xs text-neutral-dark hover:underline">Logout</button>
+          <div className="text-right hidden sm:block">
+            <p className="font-mono text-xs text-primary">{currentUser.name}</p>
+            <button onClick={handleLogout} className="text-xs text-text-muted hover:text-white transition-colors">Disconnect</button>
           </div>
-          <button onClick={() => { setSelectedIssue(null); setIssueModalOpen(true); }} className="px-4 py-2 bg-brand-primary text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors">
-            + New Issue
+          <button 
+            onClick={() => { setSelectedIssue(null); setIssueModalOpen(true); }} 
+            className="px-4 py-2 bg-primary hover:bg-primary-dark text-background font-bold rounded-md shadow-glow transition-all duration-200 flex items-center gap-2"
+          >
+            <span className="text-lg leading-none">+</span> Issue
           </button>
         </div>
       </header>
 
-      <main className="p-4 md:p-6 lg:p-8">
+      <main className="flex-grow p-4 md:p-6 lg:p-8 overflow-x-auto">
         {selectedProject ? (
-          <div className="flex flex-col md:flex-row gap-6">
+          <div className="flex flex-col md:flex-row gap-6 min-w-full md:min-w-0 h-full">
             {Object.values(Status).map(status => (
               <Column
                 key={status}
@@ -148,11 +162,14 @@ const App: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="text-center py-10">
-            <h2 className="text-2xl font-semibold mb-2">No project selected</h2>
-            <p className="text-neutral-dark mb-4">Please select a project from the dropdown or create a new one.</p>
-            <button onClick={() => setProjectModalOpen(true)} className="px-4 py-2 bg-brand-primary text-white font-semibold rounded-md hover:bg-indigo-700 transition-colors">
-              Create a Project
+          <div className="h-full flex flex-col items-center justify-center text-center py-20 opacity-80">
+            <div className="w-20 h-20 mb-6 border-2 border-dashed border-text-muted rounded-xl flex items-center justify-center">
+                <svg className="w-10 h-10 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+            </div>
+            <h2 className="text-3xl font-bold mb-2 font-mono">No Project Selected</h2>
+            <p className="text-text-muted mb-6 max-w-md">Initialize a project to start tracking bugs and managing workflows.</p>
+            <button onClick={() => setProjectModalOpen(true)} className="px-6 py-3 bg-surface border border-primary text-primary font-mono rounded hover:bg-primary hover:text-background transition-all shadow-glow">
+              Initialize Project
             </button>
           </div>
         )}
