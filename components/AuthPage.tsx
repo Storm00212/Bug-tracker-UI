@@ -75,6 +75,29 @@ const AuthPage: React.FC<AuthPageProps> = ({ users, onLogin, onSignup }) => {
             </p>
         </div>
 
+        <div className="flex justify-center mb-6">
+          <button
+            onClick={() => {
+              if (!isLoginView) toggleView();
+            }}
+            className={`px-4 py-2 font-mono text-sm rounded-l border border-border transition-all ${
+              isLoginView ? 'bg-primary text-background shadow-glow' : 'bg-surface text-text-muted hover:bg-surface-highlight'
+            }`}
+          >
+            LOGIN
+          </button>
+          <button
+            onClick={() => {
+              if (isLoginView) toggleView();
+            }}
+            className={`px-4 py-2 font-mono text-sm rounded-r border border-border transition-all ${
+              !isLoginView ? 'bg-primary text-background shadow-glow' : 'bg-surface text-text-muted hover:bg-surface-highlight'
+            }`}
+          >
+            SIGN_UP
+          </button>
+        </div>
+
         <form className="space-y-6" onSubmit={isLoginView ? handleLogin : handleSignup}>
           <div className="space-y-4">
             {!isLoginView && (
