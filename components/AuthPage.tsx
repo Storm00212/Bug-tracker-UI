@@ -124,7 +124,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ users, onLogin, onSignup }) => {
           
           {error && (
             <div className="bg-red-900/20 border border-red-500/50 text-red-200 text-xs font-mono p-3 rounded">
-                > {error}
+                {'>'} {error}
             </div>
           )}
 
@@ -140,7 +140,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ users, onLogin, onSignup }) => {
 
         <div className="mt-6 text-center">
             <button onClick={toggleView} className="text-xs font-mono text-text-muted hover:text-accent transition-colors underline decoration-dotted">
-              {isLoginView ? '> No account? Create one' : '> Already registered? Login'}
+              {isLoginView ? '{'>'} No account? Create one' : '{'>'} Already registered? Login'}
             </button>
         </div>
       </div>
