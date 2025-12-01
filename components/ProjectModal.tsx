@@ -32,7 +32,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave }) 
     <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex justify-center items-center" onClick={onClose}>
       <div className="bg-surface border border-border rounded-xl shadow-2xl p-0 w-full max-w-lg overflow-hidden" onClick={e => e.stopPropagation()}>
         <div className="p-6 border-b border-border bg-surface-highlight flex justify-between items-center">
-            <h2 className="text-xl font-bold font-mono text-primary">> INIT_PROJECT</h2>
+            <h2 className="text-xl font-bold font-mono text-primary">{'>'} INIT_PROJECT</h2>
           <button onClick={onClose} className="text-text-muted hover:text-white transition-colors">
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
