@@ -1,108 +1,148 @@
 import React, { useState, useEffect } from 'react';
-import { DUMMY_USERS, DUMMY_PROJECTS, DUMMY_ISSUES } from './constants';
-import { Project, Issue, User, Status } from './types';
+import { Project, Bug, User, Status } from './types';
+import { useAppSelector, useAppDispatch } from './store/hooks';
+import { login, register, logout, getProfile } from './store/slices/authSlice';
+import { fetchProjects, createProject, selectProject } from './store/slices/projectsSlice';
+import { fetchBugsByProject, createBug, updateBug, deleteBug } from './store/slices/bugsSlice';
 import Column from './components/Column';
 import IssueModal from './components/IssueModal';
 import ProjectModal from './components/ProjectModal';
 import AuthPage from './components/AuthPage';
 
 const App: React.FC = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [issues, setIssues] = useState<Issue[]>([]);
-  const [users, setUsers] = useState<User[]>([]);
-  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const dispatch = useAppDispatch();
+  const { user: currentUser, isLoading: authLoading, error: authError } = useAppSelector(state => state.auth);
+  const { projects, selectedProject, isLoading: projectsLoading, error: projectsError } = useAppSelector(state => state.projects);
+  const { bugs, isLoading: bugsLoading, error: bugsError } = useAppSelector(state => state.bugs);
 
   const [isIssueModalOpen, setIssueModalOpen] = useState(false);
   const [isProjectModalOpen, setProjectModalOpen] = useState(false);
-  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
-  
+  const [selectedBug, setSelectedBug] = useState<Bug | null>(null);
+
   // Load initial data
   useEffect(() => {
-    // In a real app, this would be an API call
-    setProjects(DUMMY_PROJECTS);
-    setIssues(DUMMY_ISSUES);
-    setUsers(DUMMY_USERS);
-    if (DUMMY_PROJECTS.length > 0) {
-      setSelectedProject(DUMMY_PROJECTS[0]);
+    if (currentUser) {
+      dispatch(fetchProjects());
     }
-  }, []);
+  }, [currentUser, dispatch]);
 
-  const handleLogin = (user: User) => {
-    setCurrentUser(user);
+  // Load bugs when project is selected
+  useEffect(() => {
+    if (selectedProject) {
+      dispatch(fetchBugsByProject(selectedProject.ProjectID));
+    }
+  }, [selectedProject, dispatch]);
+
+  const handleLogin = async (email: string, password: string) => {
+    try {
+      await dispatch(login({ email, password })).unwrap();
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
   };
 
-  const handleSignup = (newUser: User) => {
-    setUsers(prev => [...prev, newUser]);
-    setCurrentUser(newUser);
+  const handleSignup = async (username: string, email: string, password: string) => {
+    try {
+      await dispatch(register({ Username: username, Email: email, Password: password })).unwrap();
+    } catch (error) {
+      console.error('Signup failed:', error);
+    }
   };
 
   const handleLogout = () => {
-    setCurrentUser(null);
+    dispatch(logout());
   };
-  
-  const handleSelectIssue = (issue: Issue) => {
-    setSelectedIssue(issue);
+
+  const handleSelectBug = (bug: Bug) => {
+    setSelectedBug(bug);
     setIssueModalOpen(true);
   };
 
   const handleCloseIssueModal = () => {
     setIssueModalOpen(false);
-    setSelectedIssue(null);
-  };
-  
-  const handleSaveIssue = (issueToSave: Issue) => {
-    const issueIndex = issues.findIndex(i => i.id === issueToSave.id);
-    if (issueIndex > -1) {
-      const newIssues = [...issues];
-      newIssues[issueIndex] = issueToSave;
-      setIssues(newIssues);
-    } else {
-      setIssues([...issues, issueToSave]);
-    }
-    handleCloseIssueModal();
+    setSelectedBug(null);
   };
 
-  const handleDeleteIssue = (issueId: string) => {
-    setIssues(issues.filter(i => i.id !== issueId));
-    handleCloseIssueModal();
-  };
-
-  const handleSaveProject = (projectToSave: Project) => {
-    setProjects([...projects, projectToSave]);
-    if (!selectedProject) {
-        setSelectedProject(projectToSave);
-    }
-    setProjectModalOpen(false);
-  };
-
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, issueId: string) => {
-    e.dataTransfer.setData("issueId", issueId);
-  };
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>, status: Status) => {
-    const issueId = e.dataTransfer.getData("issueId");
-    const newIssues = issues.map(issue => {
-      if (issue.id === issueId) {
-        return { ...issue, status };
+  const handleSaveBug = async (bugToSave: Bug) => {
+    try {
+      if (selectedBug) {
+        await dispatch(updateBug({
+          id: selectedBug.BugID,
+          bug: {
+            Title: bugToSave.Title,
+            Description: bugToSave.Description,
+            Status: bugToSave.Status,
+            Priority: bugToSave.Priority,
+            AssignedTo: bugToSave.AssignedTo,
+          }
+        })).unwrap();
+      } else {
+        await dispatch(createBug({
+          Title: bugToSave.Title,
+          Description: bugToSave.Description,
+          Status: bugToSave.Status || 'Open',
+          Priority: bugToSave.Priority || 'Medium',
+          ProjectID: selectedProject!.ProjectID,
+          ReportedBy: currentUser!.UserID,
+          AssignedTo: bugToSave.AssignedTo,
+        })).unwrap();
       }
-      return issue;
-    });
-    setIssues(newIssues);
+      handleCloseIssueModal();
+    } catch (error) {
+      console.error('Save bug failed:', error);
+    }
   };
-  
-  const filteredIssues = selectedProject
-    ? issues.filter(issue => issue.projectId === selectedProject.id)
+
+  const handleDeleteBug = async (bugId: number) => {
+    try {
+      await dispatch(deleteBug(bugId)).unwrap();
+      handleCloseIssueModal();
+    } catch (error) {
+      console.error('Delete bug failed:', error);
+    }
+  };
+
+  const handleSaveProject = async (projectToSave: Project) => {
+    try {
+      await dispatch(createProject({
+        ProjectName: projectToSave.ProjectName,
+        Description: projectToSave.Description,
+        CreatedBy: currentUser!.UserID,
+      })).unwrap();
+      setProjectModalOpen(false);
+    } catch (error) {
+      console.error('Create project failed:', error);
+    }
+  };
+
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, bugId: number) => {
+    e.dataTransfer.setData("bugId", bugId.toString());
+  };
+
+  const handleDrop = async (e: React.DragEvent<HTMLDivElement>, status: string) => {
+    const bugId = parseInt(e.dataTransfer.getData("bugId"));
+    try {
+      await dispatch(updateBug({
+        id: bugId,
+        bug: { Status: status }
+      })).unwrap();
+    } catch (error) {
+      console.error('Update bug status failed:', error);
+    }
+  };
+
+  const filteredBugs = selectedProject
+    ? bugs.filter(bug => bug.ProjectID === selectedProject.ProjectID)
     : [];
 
-  const issuesByStatus = {
-    [Status.TODO]: filteredIssues.filter(i => i.status === Status.TODO),
-    [Status.IN_PROGRESS]: filteredIssues.filter(i => i.status === Status.IN_PROGRESS),
-    [Status.DONE]: filteredIssues.filter(i => i.status === Status.DONE),
+  const bugsByStatus = {
+    [Status.OPEN]: filteredBugs.filter(b => b.Status === Status.OPEN),
+    [Status.IN_PROGRESS]: filteredBugs.filter(b => b.Status === Status.IN_PROGRESS),
+    [Status.RESOLVED]: filteredBugs.filter(b => b.Status === Status.RESOLVED),
   };
 
   if (!currentUser) {
-    return <AuthPage users={users} onLogin={handleLogin} onSignup={handleSignup} />;
+    return <AuthPage onLogin={handleLogin} onSignup={handleSignup} isLoading={authLoading} />;
   }
 
   return (
@@ -115,15 +155,15 @@ const App: React.FC = () => {
                 </div>
                 <h1 className="text-xl font-bold font-mono tracking-tight">Bug_Tracker<span className="text-primary">.exe</span></h1>
             </div>
-            
+
             <div className="hidden md:flex items-center bg-surface-highlight border border-border rounded-md px-3 py-1">
                 <span className="text-text-muted text-xs font-mono mr-2">PROJECT:</span>
-                <select 
-                value={selectedProject?.id || ''} 
-                onChange={(e) => setSelectedProject(projects.find(p => p.id === e.target.value) || null)}
+                <select
+                value={selectedProject?.ProjectID || ''}
+                onChange={(e) => dispatch(selectProject(projects.find(p => p.ProjectID === parseInt(e.target.value)) || null))}
                 className="bg-transparent border-none text-sm font-semibold focus:ring-0 text-text-main cursor-pointer outline-none min-w-[150px]"
                 >
-                {projects.map(p => <option key={p.id} value={p.id} className="bg-surface">{p.name}</option>)}
+                {projects.map(p => <option key={p.ProjectID} value={p.ProjectID} className="bg-surface">{p.ProjectName}</option>)}
                 </select>
             </div>
 
@@ -131,14 +171,14 @@ const App: React.FC = () => {
               + NEW_PROJECT
             </button>
         </div>
-        
+
         <div className="flex items-center gap-4">
           <div className="text-right hidden sm:block">
-            <p className="font-mono text-xs text-primary">{currentUser.name}</p>
+            <p className="font-mono text-xs text-primary">{currentUser.Username}</p>
             <button onClick={handleLogout} className="text-xs text-text-muted hover:text-white transition-colors">Disconnect</button>
           </div>
-          <button 
-            onClick={() => { setSelectedIssue(null); setIssueModalOpen(true); }} 
+          <button
+            onClick={() => { setSelectedBug(null); setIssueModalOpen(true); }}
             className="px-4 py-2 bg-primary hover:bg-primary-dark text-background font-bold rounded-md shadow-glow transition-all duration-200 flex items-center gap-2"
           >
             <span className="text-lg leading-none">+</span> Issue
@@ -147,15 +187,20 @@ const App: React.FC = () => {
       </header>
 
       <main className="flex-grow p-4 md:p-6 lg:p-8 overflow-x-auto">
+        {(projectsError || bugsError) && (
+          <div className="mb-4 p-4 bg-red-900/20 border border-red-500/50 text-red-200 text-sm font-mono rounded">
+            Error: {projectsError || bugsError}
+          </div>
+        )}
         {selectedProject ? (
           <div className="flex flex-col md:flex-row gap-6 min-w-full md:min-w-0 h-full">
             {Object.values(Status).map(status => (
               <Column
                 key={status}
                 status={status}
-                issues={issuesByStatus[status]}
-                users={users}
-                onSelectIssue={handleSelectIssue}
+                issues={bugsByStatus[status]}
+                users={[]} // TODO: fetch users
+                onSelectIssue={handleSelectBug}
                 onDragStart={handleDragStart}
                 onDrop={handleDrop}
               />
@@ -178,11 +223,11 @@ const App: React.FC = () => {
       <IssueModal
         isOpen={isIssueModalOpen}
         onClose={handleCloseIssueModal}
-        issue={selectedIssue}
-        users={users}
-        onSave={handleSaveIssue}
-        onDelete={handleDeleteIssue}
-        projectId={selectedProject?.id || ''}
+        issue={selectedBug}
+        users={[]} // TODO: fetch users
+        onSave={handleSaveBug}
+        onDelete={handleDeleteBug}
+        projectId={selectedProject?.ProjectID.toString() || ''}
       />
 
       <ProjectModal
