@@ -1,49 +1,40 @@
 import React, { useState } from 'react';
-import { User } from '../types';
 
 interface AuthPageProps {
-  users: User[];
-  onLogin: (user: User) => void;
-  onSignup: (newUser: User) => void;
+  onLogin: (email: string, password: string) => void;
+  onSignup: (username: string, email: string, password: string) => void;
+  isLoading?: boolean;
 }
 
-const AuthPage: React.FC<AuthPageProps> = ({ users, onLogin, onSignup }) => {
+const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, isLoading = false }) => {
   const [isLoginView, setIsLoginView] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [error, setError] = useState('');
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    const user = users.find(u => u.email === email && u.password === password);
-    if (user) {
-      onLogin(user);
-    } else {
+    try {
+      await onLogin(email, password);
+    } catch (error) {
       setError('ACCESS_DENIED: Invalid credentials.');
     }
   };
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     if (!name || !email || !password) {
       setError('ERROR: All fields are required.');
       return;
     }
-    if (users.some(u => u.email === email)) {
-      setError('ERROR: Email already exists.');
-      return;
+    try {
+      await onSignup(name, email, password);
+    } catch (error) {
+      setError('ERROR: Failed to create account.');
     }
-    const newUser: User = {
-      id: `user-${Date.now()}`,
-      name,
-      email,
-      password,
-      avatar: `https://i.pravatar.cc/150?u=${Date.now()}`,
-    };
-    onSignup(newUser);
   };
 
   const toggleView = () => {
