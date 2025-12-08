@@ -4,6 +4,7 @@ import { useAppSelector, useAppDispatch } from './store/hooks';
 import { login, register, logout, getProfile } from './store/slices/authSlice';
 import { fetchProjects, createProject, selectProject } from './store/slices/projectsSlice';
 import { fetchBugsByProject, createBug, updateBug, deleteBug } from './store/slices/bugsSlice';
+import { fetchUsersByProject } from './store/slices/usersSlice';
 import Column from './components/Column';
 import IssueModal from './components/IssueModal';
 import ProjectModal from './components/ProjectModal';
@@ -14,6 +15,7 @@ const App: React.FC = () => {
   const { user: currentUser, isLoading: authLoading, error: authError } = useAppSelector(state => state.auth);
   const { projects, selectedProject, isLoading: projectsLoading, error: projectsError } = useAppSelector(state => state.projects);
   const { bugs, isLoading: bugsLoading, error: bugsError } = useAppSelector(state => state.bugs);
+  const { users } = useAppSelector(state => state.users);
 
   const [isIssueModalOpen, setIssueModalOpen] = useState(false);
   const [isProjectModalOpen, setProjectModalOpen] = useState(false);
@@ -26,10 +28,11 @@ const App: React.FC = () => {
     }
   }, [currentUser, dispatch]);
 
-  // Load bugs when project is selected
+  // Load bugs and users when project is selected
   useEffect(() => {
     if (selectedProject) {
       dispatch(fetchBugsByProject(selectedProject.ProjectID));
+      dispatch(fetchUsersByProject(selectedProject.ProjectID));
     }
   }, [selectedProject, dispatch]);
 
@@ -224,7 +227,7 @@ const App: React.FC = () => {
         isOpen={isIssueModalOpen}
         onClose={handleCloseIssueModal}
         issue={selectedBug}
-        users={[]} // TODO: fetch users
+        users={users}
         onSave={handleSaveBug}
         onDelete={handleDeleteBug}
         projectId={selectedProject?.ProjectID.toString() || ''}
