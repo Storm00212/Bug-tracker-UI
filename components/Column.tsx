@@ -1,13 +1,13 @@
 import React from 'react';
-import { Status, Issue, User } from '../types';
+import { Status, Bug, User } from '../types';
 import IssueCard from './IssueCard';
 
 interface ColumnProps {
   status: Status;
-  issues: Issue[];
+  issues: Bug[];
   users: User[];
-  onSelectIssue: (issue: Issue) => void;
-  onDragStart: (e: React.DragEvent<HTMLDivElement>, issueId: string) => void;
+  onSelectIssue: (issue: Bug) => void;
+  onDragStart: (e: React.DragEvent<HTMLDivElement>, issueId: number) => void;
   onDrop: (e: React.DragEvent<HTMLDivElement>, status: Status) => void;
 }
 
@@ -17,15 +17,15 @@ const Column: React.FC<ColumnProps> = ({ status, issues, users, onSelectIssue, o
   };
 
   const statusColors: Record<Status, string> = {
-    [Status.TODO]: 'bg-gray-700 text-gray-300 border-gray-600',
+    [Status.OPEN]: 'bg-gray-700 text-gray-300 border-gray-600',
     [Status.IN_PROGRESS]: 'bg-yellow-900/30 text-yellow-400 border-yellow-700/50',
-    [Status.DONE]: 'bg-green-900/30 text-accent border-accent/30',
+    [Status.RESOLVED]: 'bg-green-900/30 text-accent border-accent/30',
   };
 
   const statusIndicator: Record<Status, string> = {
-    [Status.TODO]: 'bg-gray-500',
+    [Status.OPEN]: 'bg-gray-500',
     [Status.IN_PROGRESS]: 'bg-yellow-500',
-    [Status.DONE]: 'bg-accent',
+    [Status.RESOLVED]: 'bg-accent',
   };
 
   return (
@@ -47,9 +47,9 @@ const Column: React.FC<ColumnProps> = ({ status, issues, users, onSelectIssue, o
       <div className="flex-grow overflow-y-auto p-3 space-y-3 custom-scrollbar">
         {issues.map((issue) => (
           <IssueCard
-            key={issue.id}
+            key={issue.BugID}
             issue={issue}
-            assignee={users.find(u => u.id === issue.assigneeId)}
+            assignee={users.find(u => u.UserID === issue.AssignedTo)}
             onSelectIssue={onSelectIssue}
             onDragStart={onDragStart}
           />
