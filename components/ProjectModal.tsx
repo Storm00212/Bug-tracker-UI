@@ -4,7 +4,7 @@ import { Project } from '../types';
 interface ProjectModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (project: Project) => void;
+  onSave: (project: { ProjectName: string; Description?: string }) => void;
 }
 
 const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave }) => {
@@ -16,12 +16,10 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave }) 
       alert('Project name is required.');
       return;
     }
-    const newProject: Project = {
-      id: `proj-${Date.now()}`,
-      name,
-      description,
-    };
-    onSave(newProject);
+    onSave({
+      ProjectName: name,
+      Description: description || undefined,
+    });
     setName('');
     setDescription('');
   };
