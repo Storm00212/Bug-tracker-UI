@@ -156,3 +156,15 @@ export const commentsAPI = {
     return response.data;
   },
 };
+
+// Users API
+export const usersAPI = {
+  getAll: async () => {
+    const response = await api.get('/api/users');
+    return response.data.users;
+  },
+  getByProject: async (projectId: number) => {
+    const response = await api.get(`/api/users/project/${projectId}`);
+    return response.data.users;
+  },
+};
