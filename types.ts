@@ -1,37 +1,106 @@
-// Fix: Populating `types.ts` with required type definitions to resolve module errors.
+// Types aligned with backend API
 export enum Priority {
   LOW = 'Low',
   MEDIUM = 'Medium',
   HIGH = 'High',
-  URGENT = 'Urgent',
+  CRITICAL = 'Critical', // Adjusted to match backend
 }
 
 export enum Status {
-  TODO = 'To Do',
+  OPEN = 'Open',
   IN_PROGRESS = 'In Progress',
-  DONE = 'Done',
+  RESOLVED = 'Resolved', // Adjusted to match backend
 }
 
 export interface User {
-  id: string;
-  name: string;
-  avatar: string;
-  email: string;
-  password?: string; // Password is for authentication simulation
+  UserID: number;
+  Username: string;
+  Email: string;
+  PasswordHash?: string; // For login
+  Role: string;
+  CreatedAt: string;
+  // Frontend specific
+  avatar?: string;
 }
 
-export interface Issue {
-  id: string;
-  title: string;
-  description: string;
-  priority: Priority;
-  status: Status;
-  assigneeId: string | null;
-  projectId: string;
+export interface Bug {
+  BugID: number;
+  Title: string;
+  Description: string | null;
+  Status: string;
+  Priority: string;
+  ProjectID: number;
+  ReportedBy: number | null;
+  AssignedTo: number | null;
+  CreatedAt: string;
+}
+
+export interface CreateBug {
+  Title: string;
+  Description?: string;
+  Status?: string;
+  Priority?: string;
+  ProjectID: number;
+  ReportedBy?: number;
+  AssignedTo?: number;
+}
+
+export interface UpdateBug {
+  Title?: string;
+  Description?: string;
+  Status?: string;
+  Priority?: string;
+  AssignedTo?: number;
 }
 
 export interface Project {
-  id: string;
-  name: string;
-  description: string;
+  ProjectID: number;
+  ProjectName: string;
+  Description: string | null;
+  CreatedBy: number;
+  CreatedAt: string;
 }
+
+export interface CreateProject {
+  ProjectName: string;
+  Description?: string;
+  CreatedBy: number;
+}
+
+export interface UpdateProject {
+  ProjectName?: string;
+  Description?: string;
+}
+
+export interface Comment {
+  CommentID: number;
+  BugID: number;
+  UserID: number;
+  CommentText: string;
+  CreatedAt: string;
+}
+
+export interface CreateComment {
+  BugID: number;
+  UserID: number;
+  CommentText: string;
+}
+
+export interface UpdateComment {
+  CommentText?: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  Username: string;
+  Email: string;
+  Password: string;
+  Role?: string;
+}
+
+// For backward compatibility, alias Issue to Bug
+export type Issue = Bug;
