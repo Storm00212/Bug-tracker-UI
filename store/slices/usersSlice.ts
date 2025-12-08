@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { User } from '../../types';
-import { authAPI } from '../../services/apiService';
+import { usersAPI } from '../../services/apiService';
 
 interface UsersState {
   users: User[];
@@ -18,11 +18,22 @@ export const fetchUsers = createAsyncThunk(
   'users/fetchUsers',
   async (_, { rejectWithValue }) => {
     try {
-      // Note: Backend doesn't have a get all users endpoint, so we'll use a placeholder
-      // In a real app, you'd add this endpoint or fetch users differently
-      return [];
+      const response = await usersAPI.getAll();
+      return response;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch users');
+    }
+  }
+);
+
+export const fetchUsersByProject = createAsyncThunk(
+  'users/fetchUsersByProject',
+  async (projectId: number, { rejectWithValue }) => {
+    try {
+      const response = await usersAPI.getByProject(projectId);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch users by project');
     }
   }
 );
@@ -46,6 +57,18 @@ const usersSlice = createSlice({
         state.users = action.payload;
       })
       .addCase(fetchUsers.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+      })
+      .addCase(fetchUsersByProject.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchUsersByProject.fulfilled, (state, action: PayloadAction<User[]>) => {
+        state.isLoading = false;
+        state.users = action.payload;
+      })
+      .addCase(fetchUsersByProject.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
       });
