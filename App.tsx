@@ -9,6 +9,7 @@ import Column from './components/Column';
 import IssueModal from './components/IssueModal';
 import ProjectModal from './components/ProjectModal';
 import AuthPage from './components/AuthPage';
+import { Toaster } from 'react-hot-toast';
 
 const App: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -237,6 +238,18 @@ const App: React.FC = () => {
         isOpen={isProjectModalOpen}
         onClose={() => setProjectModalOpen(false)}
         onSave={handleSaveProject}
+      />
+
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: '#1a1a1a',
+            color: '#fff',
+            border: '1px solid #333',
+          },
+        }}
       />
     </div>
   );
