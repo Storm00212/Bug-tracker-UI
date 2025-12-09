@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 
 interface AuthPageProps {
   onLogin: (email: string, password: string) => void;
@@ -11,35 +12,76 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, isLoading = fals
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [error, setError] = useState('');
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    if (!email.trim()) {
+      toast.error('Email is required', { duration: 4000 });
+      console.error('Login validation error: Email is required');
+      return;
+    }
+    if (!validateEmail(email)) {
+      toast.error('Invalid email format', { duration: 4000 });
+      console.error('Login validation error: Invalid email format');
+      return;
+    }
+    if (!password.trim()) {
+      toast.error('Password is required', { duration: 4000 });
+      console.error('Login validation error: Password is required');
+      return;
+    }
     try {
       await onLogin(email, password);
+      toast.success('Login successful!', { duration: 2000 });
     } catch (error) {
-      setError('ACCESS_DENIED: Invalid credentials.');
+      toast.error('Invalid credentials', { duration: 4000 });
+      console.error('Login failed:', error);
     }
   };
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    if (!name || !email || !password) {
-      setError('ERROR: All fields are required.');
+    if (!name.trim()) {
+      toast.error('Full name is required', { duration: 4000 });
+      console.error('Signup validation error: Full name is required');
+      return;
+    }
+    if (!email.trim()) {
+      toast.error('Email is required', { duration: 4000 });
+      console.error('Signup validation error: Email is required');
+      return;
+    }
+    if (!validateEmail(email)) {
+      toast.error('Invalid email format', { duration: 4000 });
+      console.error('Signup validation error: Invalid email format');
+      return;
+    }
+    if (!password.trim()) {
+      toast.error('Password is required', { duration: 4000 });
+      console.error('Signup validation error: Password is required');
+      return;
+    }
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters', { duration: 4000 });
+      console.error('Signup validation error: Password too short');
       return;
     }
     try {
       await onSignup(name, email, password);
+      toast.success('Account created successfully!', { duration: 2000 });
     } catch (error) {
-      setError('ERROR: Failed to create account.');
+      toast.error('Failed to create account. Email may already exist.', { duration: 4000 });
+      console.error('Signup failed:', error);
     }
   };
 
   const toggleView = () => {
     setIsLoginView(!isLoginView);
-    setError('');
     setEmail('');
     setPassword('');
     setName('');
@@ -135,12 +177,6 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, isLoading = fals
               />
             </div>
           </div>
-          
-          {error && (
-            <div className="bg-red-900/20 border border-red-500/50 text-red-200 text-xs font-mono p-3 rounded">
-                {'>'} {error}
-            </div>
-          )}
 
           <div>
             <button
