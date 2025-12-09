@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 
 interface AuthPageProps {
   onLogin: (email: string, password: string) => void;
-  onSignup: (username: string, email: string, password: string) => void;
+  onSignup: (username: string, email: string, password: string, role: string) => void;
   isLoading?: boolean;
 }
 
@@ -12,6 +12,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, isLoading = fals
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
+  const [role, setRole] = useState('User');
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -72,7 +73,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, isLoading = fals
       return;
     }
     try {
-      await onSignup(name, email, password);
+      await onSignup(name, email, password, role);
       toast.success('Account created successfully!', { duration: 2000 });
     } catch (error) {
       toast.error('Failed to create account. Email may already exist.', { duration: 4000 });
@@ -85,6 +86,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, isLoading = fals
     setEmail('');
     setPassword('');
     setName('');
+    setRole('User');
   };
 
   return (
@@ -176,6 +178,21 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, isLoading = fals
                 onChange={e => setPassword(e.target.value)}
               />
             </div>
+            {!isLoginView && (
+              <div>
+                <label htmlFor="role" className="block text-xs font-mono font-bold text-primary mb-1 uppercase">Role</label>
+                <select
+                  id="role"
+                  name="role"
+                  value={role}
+                  onChange={e => setRole(e.target.value)}
+                  className="block w-full px-4 py-3 bg-background border border-border text-text-main rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary appearance-none cursor-pointer"
+                >
+                  <option value="User">User</option>
+                  <option value="Admin">Admin</option>
+                </select>
+              </div>
+            )}
           </div>
 
           <div>
