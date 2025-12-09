@@ -67,8 +67,8 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, isLoading = fals
       console.error('Signup validation error: Password is required');
       return;
     }
-    if (password.length < 6) {
-      toast.error('Password must be at least 6 characters', { duration: 4000 });
+    if (password.length < 8) {
+      toast.error('Password must be at least 8 characters', { duration: 4000 });
       console.error('Signup validation error: Password too short');
       return;
     }
