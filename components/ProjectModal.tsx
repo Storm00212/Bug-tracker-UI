@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Project } from '../types';
+import toast from 'react-hot-toast';
 
 interface ProjectModalProps {
   isOpen: boolean;
@@ -11,17 +12,24 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave }) 
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!name.trim()) {
-      alert('Project name is required.');
+      toast.error('Project name is required', { duration: 4000 });
+      console.error('Project creation validation error: Project name is required');
       return;
     }
-    onSave({
-      ProjectName: name,
-      Description: description || undefined,
-    });
-    setName('');
-    setDescription('');
+    try {
+      await onSave({
+        ProjectName: name,
+        Description: description || undefined,
+      });
+      toast.success('Project created successfully!', { duration: 2000 });
+      setName('');
+      setDescription('');
+    } catch (error) {
+      toast.error('Failed to create project', { duration: 4000 });
+      console.error('Project creation failed:', error);
+    }
   };
 
   if (!isOpen) return null;
