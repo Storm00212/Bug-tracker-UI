@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Bug, User, Status, Priority } from '../types';
 import { PRIORITIES } from '../constants';
 import { generateIssueDescription } from '../services/geminiService';
+import toast from 'react-hot-toast';
 
 interface IssueModalProps {
   isOpen: boolean;
@@ -48,15 +49,30 @@ const IssueModal: React.FC<IssueModalProps> = ({ isOpen, onClose, issue, users, 
     setIsGenerating(false);
   };
 
-  const handleSave = () => {
-    if (editableBug.Title) {
-      onSave(editableBug as Bug);
+  const handleSave = async () => {
+    if (!editableBug.Title?.trim()) {
+      toast.error('Issue title is required', { duration: 4000 });
+      console.error('Issue creation/edit validation error: Title is required');
+      return;
+    }
+    try {
+      await onSave(editableBug as Bug);
+      toast.success(issue ? 'Issue updated successfully!' : 'Issue created successfully!', { duration: 2000 });
+    } catch (error) {
+      toast.error('Failed to save issue', { duration: 4000 });
+      console.error('Issue save failed:', error);
     }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     if (issue) {
-      onDelete(issue.BugID);
+      try {
+        await onDelete(issue.BugID);
+        toast.success('Issue deleted successfully!', { duration: 2000 });
+      } catch (error) {
+        toast.error('Failed to delete issue', { duration: 4000 });
+        console.error('Issue delete failed:', error);
+      }
     }
   };
 
