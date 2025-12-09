@@ -96,10 +96,10 @@ export interface LoginRequest {
 }
 
 export interface RegisterRequest {
-  Username: string;
-  Email: string;
-  Password: string;
-  Role?: string;
+  username: string;
+  email: string;
+  password: string;
+  role?: string;
 }
 
 // For backward compatibility, alias Issue to Bug
