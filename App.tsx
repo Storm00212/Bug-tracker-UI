@@ -41,8 +41,8 @@ const App: React.FC = () => {
     await dispatch(login({ email, password })).unwrap();
   };
 
-  const handleSignup = async (username: string, email: string, password: string) => {
-    await dispatch(register({ Username: username, Email: email, Password: password })).unwrap();
+  const handleSignup = async (username: string, email: string, password: string, role: string) => {
+    await dispatch(register({ Username: username, Email: email, Password: password, Role: role })).unwrap();
   };
 
   const handleLogout = () => {
