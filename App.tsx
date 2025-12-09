@@ -38,19 +38,11 @@ const App: React.FC = () => {
   }, [selectedProject, dispatch]);
 
   const handleLogin = async (email: string, password: string) => {
-    try {
-      await dispatch(login({ email, password })).unwrap();
-    } catch (error) {
-      console.error('Login failed:', error);
-    }
+    await dispatch(login({ email, password })).unwrap();
   };
 
   const handleSignup = async (username: string, email: string, password: string) => {
-    try {
-      await dispatch(register({ Username: username, Email: email, Password: password })).unwrap();
-    } catch (error) {
-      console.error('Signup failed:', error);
-    }
+    await dispatch(register({ Username: username, Email: email, Password: password })).unwrap();
   };
 
   const handleLogout = () => {
@@ -68,55 +60,43 @@ const App: React.FC = () => {
   };
 
   const handleSaveBug = async (bugToSave: Bug) => {
-    try {
-      if (selectedBug) {
-        await dispatch(updateBug({
-          id: selectedBug.BugID,
-          bug: {
-            Title: bugToSave.Title,
-            Description: bugToSave.Description,
-            Status: bugToSave.Status,
-            Priority: bugToSave.Priority,
-            AssignedTo: bugToSave.AssignedTo,
-          }
-        })).unwrap();
-      } else {
-        await dispatch(createBug({
+    if (selectedBug) {
+      await dispatch(updateBug({
+        id: selectedBug.BugID,
+        bug: {
           Title: bugToSave.Title,
           Description: bugToSave.Description,
-          Status: bugToSave.Status || 'Open',
-          Priority: bugToSave.Priority || 'Medium',
-          ProjectID: selectedProject!.ProjectID,
-          ReportedBy: currentUser!.UserID,
+          Status: bugToSave.Status,
+          Priority: bugToSave.Priority,
           AssignedTo: bugToSave.AssignedTo,
-        })).unwrap();
-      }
-      handleCloseIssueModal();
-    } catch (error) {
-      console.error('Save bug failed:', error);
+        }
+      })).unwrap();
+    } else {
+      await dispatch(createBug({
+        Title: bugToSave.Title,
+        Description: bugToSave.Description,
+        Status: bugToSave.Status || 'Open',
+        Priority: bugToSave.Priority || 'Medium',
+        ProjectID: selectedProject!.ProjectID,
+        ReportedBy: currentUser!.UserID,
+        AssignedTo: bugToSave.AssignedTo,
+      })).unwrap();
     }
+    handleCloseIssueModal();
   };
 
   const handleDeleteBug = async (bugId: number) => {
-    try {
-      await dispatch(deleteBug(bugId)).unwrap();
-      handleCloseIssueModal();
-    } catch (error) {
-      console.error('Delete bug failed:', error);
-    }
+    await dispatch(deleteBug(bugId)).unwrap();
+    handleCloseIssueModal();
   };
 
   const handleSaveProject = async (projectToSave: Project) => {
-    try {
-      await dispatch(createProject({
-        ProjectName: projectToSave.ProjectName,
-        Description: projectToSave.Description,
-        CreatedBy: currentUser!.UserID,
-      })).unwrap();
-      setProjectModalOpen(false);
-    } catch (error) {
-      console.error('Create project failed:', error);
-    }
+    await dispatch(createProject({
+      ProjectName: projectToSave.ProjectName,
+      Description: projectToSave.Description,
+      CreatedBy: currentUser!.UserID,
+    })).unwrap();
+    setProjectModalOpen(false);
   };
 
   const handleDragStart = (e: React.DragEvent<HTMLDivElement>, bugId: number) => {
@@ -145,12 +125,10 @@ const App: React.FC = () => {
     [Status.RESOLVED]: filteredBugs.filter(b => b.Status === Status.RESOLVED),
   };
 
-  if (!currentUser) {
-    return <AuthPage onLogin={handleLogin} onSignup={handleSignup} isLoading={authLoading} />;
-  }
-
-  return (
-    <div className="bg-background min-h-screen font-sans text-text-main flex flex-col">
+  const content = !currentUser ? (
+    <AuthPage onLogin={handleLogin} onSignup={handleSignup} isLoading={authLoading} />
+  ) : (
+    <>
       <header className="bg-surface border-b border-border p-4 flex justify-between items-center sticky top-0 z-10 backdrop-blur-sm bg-surface/90">
         <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
@@ -239,15 +217,21 @@ const App: React.FC = () => {
         onClose={() => setProjectModalOpen(false)}
         onSave={handleSaveProject}
       />
+    </>
+  );
+
+  return (
+    <div className="bg-background min-h-screen font-sans text-text-main flex flex-col">
+      {content}
 
       <Toaster
         position="top-right"
         toastOptions={{
           duration: 4000,
           style: {
-            background: '#1a1a1a',
+            background: '#ff4444',
             color: '#fff',
-            border: '1px solid #333',
+            border: '1px solid #ff6666',
           },
         }}
       />
