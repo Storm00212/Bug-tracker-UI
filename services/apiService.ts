@@ -14,7 +14,7 @@ import {
   RegisterRequest,
 } from '../types';
 
-const API_BASE_URL = 'http://localhost:3000'; // Adjust if needed
+const API_BASE_URL = 'https://bug-tracker2-1-0kjg.onrender.com'; // Adjust if needed
 
 const api = axios.create({
   baseURL: API_BASE_URL,
