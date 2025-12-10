@@ -15,6 +15,7 @@ const Dashboard: React.FC = () => {
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'open' | 'closed'>('all');
+  const [showIssuesTooltip, setShowIssuesTooltip] = useState(false);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -47,6 +48,11 @@ const Dashboard: React.FC = () => {
 
   const getReporter = (bug: Bug) => {
     return allUsers.find(u => u.UserID === bug.ReportedBy);
+  };
+
+  const getProjectName = (projectId: number) => {
+    const project = projects.find(p => p.ProjectID === projectId);
+    return project ? project.ProjectName : `Project #${projectId}`;
   };
 
   const handleProjectSelect = (projectId: number) => {
@@ -100,9 +106,13 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-surface-highlight border border-border rounded-lg p-6 hover:border-accent/50 transition-all duration-200">
+        <div className="bg-surface-highlight border border-border rounded-lg p-6 hover:border-accent/50 transition-all duration-200 relative">
           <div className="flex items-center justify-between">
-            <div>
+            <div
+              className="cursor-help"
+              onMouseEnter={() => setShowIssuesTooltip(true)}
+              onMouseLeave={() => setShowIssuesTooltip(false)}
+            >
               <p className="text-text-muted text-sm font-mono uppercase tracking-wider">Assigned Issues</p>
               <p className="text-3xl font-bold text-accent mt-2">{assignedBugs.length}</p>
             </div>
@@ -112,6 +122,43 @@ const Dashboard: React.FC = () => {
               </svg>
             </div>
           </div>
+
+          {/* Issues Tooltip */}
+          {showIssuesTooltip && assignedBugs.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-surface border border-border rounded-lg shadow-lg z-50 max-h-64 overflow-y-auto">
+              <div className="p-3 border-b border-border">
+                <h4 className="text-sm font-bold text-text-main font-mono">Your Assigned Issues</h4>
+              </div>
+              <div className="max-h-48 overflow-y-auto">
+                {assignedBugs.slice(0, 10).map((bug) => (
+                  <div key={bug.BugID} className="p-3 border-b border-border/50 last:border-b-0 hover:bg-surface-highlight/50">
+                    <div className="flex justify-between items-start mb-2">
+                      <h5 className="text-sm font-medium text-text-main line-clamp-1">{bug.Title}</h5>
+                      <span className={`text-[10px] font-mono px-2 py-1 rounded border ml-2 ${
+                        bug.Status === 'Open' ? 'text-green-400 border-green-400/50 bg-green-400/10' :
+                        bug.Status === 'In Progress' ? 'text-yellow-400 border-yellow-400/50 bg-yellow-400/10' :
+                        'text-gray-400 border-gray-400/50 bg-gray-400/10'
+                      }`}>
+                        {bug.Status}
+                      </span>
+                    </div>
+                    {bug.Description && (
+                      <p className="text-xs text-text-muted mb-2 line-clamp-2">{bug.Description}</p>
+                    )}
+                    <div className="flex justify-between items-center text-xs text-text-muted">
+                      <span className="font-mono">#{bug.BugID}</span>
+                      <span className="font-medium">{getProjectName(bug.ProjectID)}</span>
+                    </div>
+                  </div>
+                ))}
+                {assignedBugs.length > 10 && (
+                  <div className="p-3 text-center text-xs text-text-muted border-t border-border">
+                    And {assignedBugs.length - 10} more issues...
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
