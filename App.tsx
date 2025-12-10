@@ -9,6 +9,7 @@ import Column from './components/Column';
 import IssueModal from './components/IssueModal';
 import ProjectModal from './components/ProjectModal';
 import AuthPage from './components/AuthPage';
+import Dashboard from './components/Dashboard';
 import { Toaster } from 'react-hot-toast';
 
 const App: React.FC = () => {
@@ -189,16 +190,7 @@ const App: React.FC = () => {
             ))}
           </div>
         ) : (
-          <div className="h-full flex flex-col items-center justify-center text-center py-20 opacity-80">
-            <div className="w-20 h-20 mb-6 border-2 border-dashed border-text-muted rounded-xl flex items-center justify-center">
-                <svg className="w-10 h-10 text-text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-            </div>
-            <h2 className="text-3xl font-bold mb-2 font-mono">No Project Selected</h2>
-            <p className="text-text-muted mb-6 max-w-md">Initialize a project to start tracking bugs and managing workflows.</p>
-            <button onClick={() => setProjectModalOpen(true)} className="px-6 py-3 bg-surface border border-primary text-primary font-mono rounded hover:bg-primary hover:text-background transition-all shadow-glow">
-              Initialize Project
-            </button>
-          </div>
+          <Dashboard />
         )}
       </main>
 
