@@ -1,0 +1,23 @@
+[
+  {
+    "UserID": 1,
+    "Username": "testuser",
+    "Email": "test@example.com",
+    "Role": "User",
+    "CreatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "UserID": 2,
+    "Username": "johndoe",
+    "Email": "john@example.com",
+    "Role": "User",
+    "CreatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "UserID": 3,
+    "Username": "admin",
+    "Email": "admin@example.com",
+    "Role": "Admin",
+    "CreatedAt": "2024-01-01T00:00:00.000Z"
+  }
+]
