@@ -1,0 +1,23 @@
+[
+  {
+    "ProjectID": 1,
+    "ProjectName": "Project Alpha",
+    "Description": "First project",
+    "CreatedBy": 1,
+    "CreatedAt": "2024-01-01T00:00:00.000Z"
+  },
+  {
+    "ProjectID": 2,
+    "ProjectName": "Project Beta",
+    "Description": "Second project",
+    "CreatedBy": 1,
+    "CreatedAt": "2024-01-02T00:00:00.000Z"
+  },
+  {
+    "ProjectID": 3,
+    "ProjectName": "Project Gamma",
+    "Description": "Third project",
+    "CreatedBy": 1,
+    "CreatedAt": "2024-01-03T00:00:00.000Z"
+  }
+]
