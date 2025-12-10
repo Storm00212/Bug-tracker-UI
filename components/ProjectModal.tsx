@@ -35,7 +35,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave }) 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex justify-center items-center" onClick={onClose}>
+    <div data-cy="project-modal" className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex justify-center items-center" onClick={onClose}>
       <div className="bg-surface border border-border rounded-xl shadow-2xl p-0 w-full max-w-lg overflow-hidden" onClick={e => e.stopPropagation()}>
         <div className="p-6 border-b border-border bg-surface-highlight flex justify-between items-center">
             <h2 className="text-xl font-bold font-mono text-primary">{'>'} INIT_PROJECT</h2>
@@ -48,6 +48,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave }) 
           <div>
             <label className="block text-xs font-mono font-bold text-primary mb-2 uppercase tracking-wider">Project Name</label>
             <input
+              data-cy="project-name-input"
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -58,6 +59,7 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave }) 
           <div>
             <label className="block text-xs font-mono font-bold text-primary mb-2 uppercase tracking-wider">Description</label>
             <textarea
+              data-cy="project-description-input"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={4}
@@ -68,10 +70,10 @@ const ProjectModal: React.FC<ProjectModalProps> = ({ isOpen, onClose, onSave }) 
         </div>
         
         <div className="p-6 border-t border-border bg-surface-highlight flex justify-end gap-4">
-          <button onClick={onClose} className="px-4 py-2 text-text-muted hover:text-white transition-colors font-mono text-sm">
+          <button data-cy="project-cancel-button" onClick={onClose} className="px-4 py-2 text-text-muted hover:text-white transition-colors font-mono text-sm">
             CANCEL
           </button>
-          <button onClick={handleSave} className="px-6 py-2 bg-primary hover:bg-primary-dark text-background font-bold rounded shadow-glow transition-all font-mono text-sm">
+          <button data-cy="project-submit-button" onClick={handleSave} className="px-6 py-2 bg-primary hover:bg-primary-dark text-background font-bold rounded shadow-glow transition-all font-mono text-sm">
             CREATE_PROJECT
           </button>
         </div>
