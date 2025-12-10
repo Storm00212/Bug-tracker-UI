@@ -112,6 +112,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, isLoading = fals
 
         <div className="flex justify-center mb-6">
           <button
+            data-cy="login-button"
             onClick={() => {
               if (!isLoginView) toggleView();
             }}
@@ -122,6 +123,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, isLoading = fals
             LOGIN
           </button>
           <button
+            data-cy="signup-button"
             onClick={() => {
               if (isLoginView) toggleView();
             }}
@@ -139,6 +141,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, isLoading = fals
               <div>
                 <label htmlFor="name" className="block text-xs font-mono font-bold text-primary mb-1 uppercase">Full Name</label>
                 <input
+                  data-cy="username-input"
                   id="name"
                   name="name"
                   type="text"
@@ -153,6 +156,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, isLoading = fals
             <div>
               <label htmlFor="email-address" className="block text-xs font-mono font-bold text-primary mb-1 uppercase">Email Address</label>
               <input
+                data-cy="email-input"
                 id="email-address"
                 name="email"
                 type="email"
@@ -167,6 +171,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, isLoading = fals
             <div>
               <label htmlFor="password" className="block text-xs font-mono font-bold text-primary mb-1 uppercase">Password</label>
               <input
+                data-cy="password-input"
                 id="password"
                 name="password"
                 type="password"
@@ -182,6 +187,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, isLoading = fals
               <div>
                 <label htmlFor="role" className="block text-xs font-mono font-bold text-primary mb-1 uppercase">Role</label>
                 <select
+                  data-cy="role-select"
                   id="role"
                   name="role"
                   value={role}
@@ -197,6 +203,7 @@ const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onSignup, isLoading = fals
 
           <div>
             <button
+              data-cy={isLoginView ? "login-submit-button" : "register-submit-button"}
               type="submit"
               className="group w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded text-background bg-primary hover:bg-primary-dark focus:outline-none shadow-glow transition-all font-mono"
             >
