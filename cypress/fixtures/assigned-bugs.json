@@ -1,0 +1,57 @@
+[
+  {
+    "BugID": 101,
+    "Title": "Fix login issue",
+    "Description": "Users cannot log in with valid credentials",
+    "Status": "Open",
+    "Priority": "High",
+    "ProjectID": 1,
+    "ReportedBy": 2,
+    "AssignedTo": 1,
+    "CreatedAt": "2024-01-15T10:00:00.000Z"
+  },
+  {
+    "BugID": 102,
+    "Title": "Dashboard loading slow",
+    "Description": "Dashboard takes too long to load on mobile devices",
+    "Status": "In Progress",
+    "Priority": "Medium",
+    "ProjectID": 1,
+    "ReportedBy": 3,
+    "AssignedTo": 1,
+    "CreatedAt": "2024-01-14T09:00:00.000Z"
+  },
+  {
+    "BugID": 103,
+    "Title": "Button styling broken",
+    "Description": "Submit button has incorrect styling in Firefox",
+    "Status": "Open",
+    "Priority": "Low",
+    "ProjectID": 2,
+    "ReportedBy": 2,
+    "AssignedTo": 1,
+    "CreatedAt": "2024-01-13T08:00:00.000Z"
+  },
+  {
+    "BugID": 104,
+    "Title": "API timeout error",
+    "Description": "API calls timeout after 30 seconds",
+    "Status": "Resolved",
+    "Priority": "Critical",
+    "ProjectID": 1,
+    "ReportedBy": 1,
+    "AssignedTo": 1,
+    "CreatedAt": "2024-01-12T07:00:00.000Z"
+  },
+  {
+    "BugID": 105,
+    "Title": "Email notifications not working",
+    "Description": "Users don't receive email notifications",
+    "Status": "Resolved",
+    "Priority": "High",
+    "ProjectID": 3,
+    "ReportedBy": 3,
+    "AssignedTo": 1,
+    "CreatedAt": "2024-01-11T06:00:00.000Z"
+  }
+]
