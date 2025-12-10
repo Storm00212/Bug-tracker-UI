@@ -10,6 +10,7 @@ import IssueModal from './components/IssueModal';
 import ProjectModal from './components/ProjectModal';
 import AuthPage from './components/AuthPage';
 import Dashboard from './components/Dashboard';
+import AdminDashboard from './components/AdminDashboard';
 import { Toaster } from 'react-hot-toast';
 
 const App: React.FC = () => {
@@ -190,7 +191,7 @@ const App: React.FC = () => {
             ))}
           </div>
         ) : (
-          <Dashboard />
+          currentUser?.Role === 'Admin' ? <AdminDashboard /> : <Dashboard />
         )}
       </main>
 
