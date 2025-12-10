@@ -37,7 +37,9 @@ export const authAPI = {
   },
   register: async (userData: RegisterRequest) => {
     const response = await api.post('/api/users/register', userData);
-    return response.data.user;
+    const { user, token } = response.data;
+    localStorage.setItem('token', token);
+    return { user, token };
   },
   getProfile: async () => {
     const response = await api.get('/api/users/profile');
