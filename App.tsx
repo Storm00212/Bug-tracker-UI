@@ -143,6 +143,7 @@ const App: React.FC = () => {
             <div className="hidden md:flex items-center bg-surface-highlight border border-border rounded-md px-3 py-1">
                 <span className="text-text-muted text-xs font-mono mr-2">PROJECT:</span>
                 <select
+                data-cy="project-selector"
                 value={selectedProject?.ProjectID || ''}
                 onChange={(e) => dispatch(selectProject(projects.find(p => p.ProjectID === parseInt(e.target.value)) || null))}
                 className="bg-transparent border-none text-sm font-semibold focus:ring-0 text-text-main cursor-pointer outline-none min-w-[150px]"
@@ -151,7 +152,7 @@ const App: React.FC = () => {
                 </select>
             </div>
 
-            <button onClick={() => setProjectModalOpen(true)} className="text-xs font-mono text-primary hover:text-accent transition-colors border border-primary/30 hover:border-accent/50 rounded px-2 py-1">
+            <button data-cy="new-project-button" onClick={() => setProjectModalOpen(true)} className="text-xs font-mono text-primary hover:text-accent transition-colors border border-primary/30 hover:border-accent/50 rounded px-2 py-1">
               + NEW_PROJECT
             </button>
         </div>
@@ -159,9 +160,10 @@ const App: React.FC = () => {
         <div className="flex items-center gap-4">
           <div className="text-right hidden sm:block">
             <p className="font-mono text-xs text-primary">{currentUser.Username}</p>
-            <button onClick={handleLogout} className="text-xs text-text-muted hover:text-white transition-colors">Disconnect</button>
+            <button data-cy="logout-button" onClick={handleLogout} className="text-xs text-text-muted hover:text-white transition-colors">Disconnect</button>
           </div>
           <button
+            data-cy="new-issue-button"
             onClick={() => { setSelectedBug(null); setIssueModalOpen(true); }}
             className="px-4 py-2 bg-primary hover:bg-primary-dark text-background font-bold rounded-md shadow-glow transition-all duration-200 flex items-center gap-2"
           >
