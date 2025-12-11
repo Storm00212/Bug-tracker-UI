@@ -18,3 +18,11 @@ import './commands'
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+// Ensure Redux store is available for tests
+beforeEach(() => {
+  // Clear localStorage before each test to ensure clean state
+  cy.window().then((win) => {
+    win.localStorage.clear();
+  });
+});
