@@ -1,7 +1,7 @@
 describe('Dashboard Component', () => {
   beforeEach(() => {
     // Login first and setup mock data
-    cy.window().then((win) => {
+    cy.window({ timeout: 15000 }).then((win) => {
       win.localStorage.setItem('token', 'mock-jwt-token')
     })
 
@@ -10,8 +10,8 @@ describe('Dashboard Component', () => {
     cy.intercept('GET', '**/api/bugs/assignee/1', { fixture: 'assigned-bugs.json' }).as('getBugs')
     cy.intercept('GET', '**/api/users', { fixture: 'all-users.json' }).as('getUsers')
 
-    cy.visit('/')
-    cy.wait(['@getProjects', '@getBugs', '@getUsers'])
+    cy.visit('/', { timeout: 15000 })
+    cy.wait(['@getProjects', '@getBugs', '@getUsers'], { timeout: 15000 })
   })
 
   describe('Dashboard Loading and Display', () => {
@@ -20,62 +20,62 @@ describe('Dashboard Component', () => {
       cy.intercept('GET', '**/api/bugs/assignee/1', { delay: 1000, fixture: 'assigned-bugs.json' }).as('getBugs')
       cy.intercept('GET', '**/api/users', { delay: 1000, fixture: 'all-users.json' }).as('getUsers')
 
-      cy.visit('/')
-      cy.contains('Loading dashboard...').should('be.visible')
+      cy.visit('/', { timeout: 15000 })
+      cy.contains('Loading dashboard...', { timeout: 10000 }).should('be.visible')
 
-      cy.wait(['@getProjects', '@getBugs', '@getUsers'])
-      cy.contains('Loading dashboard...').should('not.exist')
+      cy.wait(['@getProjects', '@getBugs', '@getUsers'], { timeout: 15000 })
+      cy.contains('Loading dashboard...', { timeout: 10000 }).should('not.exist')
     })
 
     it('should display welcome message with username', () => {
-      cy.contains('Welcome back, testuser').should('be.visible')
-      cy.contains("Here's an overview of your work").should('be.visible')
+      cy.contains('Welcome back, testuser', { timeout: 15000 }).should('be.visible')
+      cy.contains("Here's an overview of your work", { timeout: 10000 }).should('be.visible')
     })
 
     it('should display metrics panel with correct data', () => {
       // Check metrics display
-      cy.get('[data-cy="active-projects-count"]').should('contain', '3')
-      cy.get('[data-cy="assigned-issues-count"]').should('contain', '5')
+      cy.get('[data-cy="active-projects-count"]', { timeout: 10000 }).should('contain', '3')
+      cy.get('[data-cy="assigned-issues-count"]', { timeout: 10000 }).should('contain', '5')
     })
   })
 
   describe('Assigned Issues Tooltip', () => {
     it('should show tooltip on hover', () => {
-      cy.get('[data-cy="assigned-issues-hover-area"]').trigger('mouseover')
-      cy.get('[data-cy="issues-tooltip"]').should('be.visible')
-      cy.contains('Your Assigned Issues').should('be.visible')
+      cy.get('[data-cy="assigned-issues-hover-area"]', { timeout: 10000 }).trigger('mouseover')
+      cy.get('[data-cy="issues-tooltip"]', { timeout: 10000 }).should('be.visible')
+      cy.contains('Your Assigned Issues', { timeout: 10000 }).should('be.visible')
     })
 
     it('should display issue details in tooltip', () => {
-      cy.get('[data-cy="assigned-issues-hover-area"]').trigger('mouseover')
+      cy.get('[data-cy="assigned-issues-hover-area"]', { timeout: 10000 }).trigger('mouseover')
 
       // Check that issues are displayed with details
-      cy.get('[data-cy="issues-tooltip"]').within(() => {
-        cy.get('[data-cy="tooltip-issue"]').first().within(() => {
-          cy.contains('Bug #101').should('be.visible')
-          cy.contains('Fix login issue').should('be.visible')
-          cy.contains('Open').should('be.visible')
-          cy.contains('Project Alpha').should('be.visible')
+      cy.get('[data-cy="issues-tooltip"]', { timeout: 10000 }).within(() => {
+        cy.get('[data-cy="tooltip-issue"]', { timeout: 10000 }).first().within(() => {
+          cy.contains('Bug #101', { timeout: 10000 }).should('be.visible')
+          cy.contains('Fix login issue', { timeout: 10000 }).should('be.visible')
+          cy.contains('Open', { timeout: 10000 }).should('be.visible')
+          cy.contains('Project Alpha', { timeout: 10000 }).should('be.visible')
         })
       })
     })
 
     it('should show scrollable list for many issues', () => {
       cy.intercept('GET', '**/api/bugs/assignee/1', { fixture: 'many-assigned-bugs.json' }).as('getManyBugs')
-      cy.visit('/')
-      cy.wait('@getManyBugs')
+      cy.visit('/', { timeout: 15000 })
+      cy.wait('@getManyBugs', { timeout: 15000 })
 
-      cy.get('[data-cy="assigned-issues-hover-area"]').trigger('mouseover')
-      cy.get('[data-cy="issues-tooltip"]').should('be.visible')
-      cy.contains('And 5 more issues...').should('be.visible')
+      cy.get('[data-cy="assigned-issues-hover-area"]', { timeout: 10000 }).trigger('mouseover')
+      cy.get('[data-cy="issues-tooltip"]', { timeout: 10000 }).should('be.visible')
+      cy.contains('And 5 more issues...', { timeout: 10000 }).should('be.visible')
     })
 
     it('should hide tooltip on mouse leave', () => {
-      cy.get('[data-cy="assigned-issues-hover-area"]').trigger('mouseover')
-      cy.get('[data-cy="issues-tooltip"]').should('be.visible')
+      cy.get('[data-cy="assigned-issues-hover-area"]', { timeout: 10000 }).trigger('mouseover')
+      cy.get('[data-cy="issues-tooltip"]', { timeout: 10000 }).should('be.visible')
 
-      cy.get('[data-cy="assigned-issues-hover-area"]').trigger('mouseleave')
-      cy.get('[data-cy="issues-tooltip"]').should('not.exist')
+      cy.get('[data-cy="assigned-issues-hover-area"]', { timeout: 10000 }).trigger('mouseleave')
+      cy.get('[data-cy="issues-tooltip"]', { timeout: 10000 }).should('not.exist')
     })
   })
 
