@@ -13,7 +13,6 @@
     "test:e2e:headed": "cypress run --headed"
   },
   "dependencies": {
-    "@google/genai": "^1.29.0",
     "@reduxjs/toolkit": "^2.11.1",
     "axios": "^1.13.2",
     "react": "^19.2.0",
