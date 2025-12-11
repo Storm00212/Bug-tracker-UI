@@ -1,10 +1,14 @@
 describe('Authentication', () => {
   beforeEach(() => {
     cy.visit('/')
+    // Wait for the app to load and Redux to initialize
+    cy.window().should('have.property', 'Cypress')
   })
 
   describe('Login Functionality', () => {
     it('should display login form by default', () => {
+      // Wait for the auth page to render
+      cy.get('[data-cy="login-button"]', { timeout: 10000 }).should('be.visible')
       cy.contains('Welcome_Back').should('be.visible')
       cy.get('input[name="email"]').should('be.visible')
       cy.get('input[name="password"]').should('be.visible')
@@ -13,15 +17,15 @@ describe('Authentication', () => {
     })
 
     it('should show validation errors for empty fields', () => {
-      cy.contains('AUTHENTICATE').click()
+      cy.get('[data-cy="login-submit-button"]', { timeout: 10000 }).should('be.visible').click()
       // Should show error toast
       cy.contains('Email is required').should('be.visible')
     })
 
     it('should show error for invalid credentials', () => {
-      cy.get('input[name="email"]').type('invalid@email.com')
-      cy.get('input[name="password"]').type('wrongpassword')
-      cy.contains('AUTHENTICATE').click()
+      cy.get('[data-cy="email-input"]').type('invalid@email.com')
+      cy.get('[data-cy="password-input"]').type('wrongpassword')
+      cy.get('[data-cy="login-submit-button"]').click()
 
       // Should show error message
       cy.contains('Invalid credentials').should('be.visible')
@@ -30,9 +34,9 @@ describe('Authentication', () => {
     it('should successfully login with valid credentials', () => {
       cy.intercept('POST', '**/api/users/login', { fixture: 'login-success.json' }).as('loginRequest')
 
-      cy.get('input[name="email"]').type('test@example.com')
-      cy.get('input[name="password"]').type('password123')
-      cy.contains('AUTHENTICATE').click()
+      cy.get('[data-cy="email-input"]').type('test@example.com')
+      cy.get('[data-cy="password-input"]').type('password123')
+      cy.get('[data-cy="login-submit-button"]').click()
 
       cy.wait('@loginRequest')
       cy.contains('Welcome back').should('be.visible')
@@ -41,9 +45,9 @@ describe('Authentication', () => {
     it('should handle network errors during login', () => {
       cy.intercept('POST', '**/api/users/login', { forceNetworkError: true }).as('loginError')
 
-      cy.get('input[name="email"]').type('test@example.com')
-      cy.get('input[name="password"]').type('password123')
-      cy.contains('AUTHENTICATE').click()
+      cy.get('[data-cy="email-input"]').type('test@example.com')
+      cy.get('[data-cy="password-input"]').type('password123')
+      cy.get('[data-cy="login-submit-button"]').click()
 
       cy.wait('@loginError')
       cy.contains('Network error').should('be.visible')
@@ -52,23 +56,23 @@ describe('Authentication', () => {
 
   describe('Signup Functionality', () => {
     it('should display signup form when signup button is clicked', () => {
-      cy.contains('SIGN_UP').click()
+      cy.get('[data-cy="signup-button"]').click()
       cy.contains('Init_User').should('be.visible')
-      cy.get('input[name="name"]').should('be.visible')
-      cy.get('input[name="email"]').should('be.visible')
-      cy.get('input[name="password"]').should('be.visible')
-      cy.get('select[name="role"]').should('be.visible')
+      cy.get('[data-cy="username-input"]').should('be.visible')
+      cy.get('[data-cy="email-input"]').should('be.visible')
+      cy.get('[data-cy="password-input"]').should('be.visible')
+      cy.get('[data-cy="role-select"]').should('be.visible')
     })
 
     it('should successfully register a new user', () => {
       cy.intercept('POST', '**/api/users/register', { fixture: 'register-success.json' }).as('registerRequest')
 
-      cy.contains('SIGN_UP').click()
-      cy.get('input[name="name"]').type('newuser')
-      cy.get('input[name="email"]').type('newuser@example.com')
-      cy.get('input[name="password"]').type('password123')
-      cy.get('select[name="role"]').select('User')
-      cy.contains('CREATE_ACCOUNT').click()
+      cy.get('[data-cy="signup-button"]').click()
+      cy.get('[data-cy="username-input"]').type('newuser')
+      cy.get('[data-cy="email-input"]').type('newuser@example.com')
+      cy.get('[data-cy="password-input"]').type('password123')
+      cy.get('[data-cy="role-select"]').select('User')
+      cy.get('[data-cy="register-submit-button"]').click()
 
       cy.wait('@registerRequest')
       cy.contains('Account created successfully').should('be.visible')
@@ -80,12 +84,12 @@ describe('Authentication', () => {
         body: { message: 'Failed to create account. Email may already exist.' }
       }).as('registerError')
 
-      cy.contains('SIGN_UP').click()
-      cy.get('input[name="name"]').type('existinguser')
-      cy.get('input[name="email"]').type('existing@example.com')
-      cy.get('input[name="password"]').type('password123')
-      cy.get('select[name="role"]').select('User')
-      cy.contains('CREATE_ACCOUNT').click()
+      cy.get('[data-cy="signup-button"]').click()
+      cy.get('[data-cy="username-input"]').type('existinguser')
+      cy.get('[data-cy="email-input"]').type('existing@example.com')
+      cy.get('[data-cy="password-input"]').type('password123')
+      cy.get('[data-cy="role-select"]').select('User')
+      cy.get('[data-cy="register-submit-button"]').click()
 
       cy.wait('@registerError')
       cy.contains('Failed to create account').should('be.visible')
@@ -117,7 +121,7 @@ describe('Authentication', () => {
       cy.visit('/')
       cy.wait('@expiredToken')
       // Should redirect to login
-      cy.contains('Welcome_Back').should('be.visible')
+      cy.get('[data-cy="login-button"]').should('be.visible')
     })
 
     it('should logout successfully', () => {
@@ -130,8 +134,8 @@ describe('Authentication', () => {
       cy.contains('Welcome back').should('be.visible')
 
       // Click logout
-      cy.contains('Disconnect').click()
-      cy.contains('Welcome_Back').should('be.visible')
+      cy.get('[data-cy="logout-button"]').click()
+      cy.get('[data-cy="login-button"]').should('be.visible')
       cy.window().then((win) => {
         expect(win.localStorage.getItem('token')).to.be.null
       })
