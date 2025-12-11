@@ -14,35 +14,35 @@
 Cypress.Commands.add('login', (email: string, password: string) => {
   cy.session([email, password], () => {
     cy.visit('/')
-    cy.get('[data-cy="email-input"]').type(email)
-    cy.get('[data-cy="password-input"]').type(password)
-    cy.get('[data-cy="login-button"]').click()
-    cy.url().should('not.include', '/auth')
+    cy.get('input[name="email"]').type(email)
+    cy.get('input[name="password"]').type(password)
+    cy.contains('AUTHENTICATE').click()
+    cy.contains('Welcome back').should('be.visible')
   })
 })
 
 // Custom command to create a project
 Cypress.Commands.add('createProject', (name: string, description: string) => {
-  cy.get('[data-cy="new-project-button"]').click()
-  cy.get('[data-cy="project-name-input"]').type(name)
-  cy.get('[data-cy="project-description-input"]').type(description)
-  cy.get('[data-cy="project-submit-button"]').click()
-  cy.get('[data-cy="project-modal"]').should('not.exist')
+  cy.contains('+ NEW_PROJECT').click()
+  cy.get('input[placeholder*="Q4_Marketing_Campaign"]').type(name)
+  cy.get('textarea[placeholder*="Brief summary"]').type(description)
+  cy.contains('CREATE_PROJECT').click()
+  cy.contains('INIT_PROJECT').should('not.exist')
 })
 
 // Custom command to create an issue
 Cypress.Commands.add('createIssue', (title: string, description: string, priority: string = 'Medium') => {
-  cy.get('[data-cy="new-issue-button"]').click()
-  cy.get('[data-cy="issue-title-input"]').type(title)
-  cy.get('[data-cy="issue-description-input"]').type(description)
-  cy.get('[data-cy="issue-priority-select"]').select(priority)
-  cy.get('[data-cy="issue-submit-button"]').click()
-  cy.get('[data-cy="issue-modal"]').should('not.exist')
+  cy.contains('+ Issue').click()
+  cy.get('input[placeholder*="Brief summary"]').type(title)
+  cy.get('textarea[placeholder*="Steps to reproduce"]').type(description)
+  cy.get('select[name="Priority"]').select(priority)
+  cy.contains('CREATE_ISSUE').click()
+  cy.contains('NEW_ISSUE').should('not.exist')
 })
 
 // Custom command to select a project
 Cypress.Commands.add('selectProject', (projectName: string) => {
-  cy.get('[data-cy="project-selector"]').select(projectName)
+  cy.get('select').select(projectName)
 })
 
 // Custom command to check dashboard metrics
@@ -65,7 +65,7 @@ Cypress.Commands.add('setupStoreState', (state: any) => {
 
 // Custom command to check tooltip content
 Cypress.Commands.add('checkIssuesTooltip', (expectedIssues: number) => {
-  cy.get('[data-cy="assigned-issues-metric"]').trigger('mouseover')
+  cy.get('[data-cy="assigned-issues-hover-area"]').trigger('mouseover')
   cy.get('[data-cy="issues-tooltip"]').should('be.visible')
   cy.get('[data-cy="issues-tooltip"]').find('[data-cy="tooltip-issue"]').should('have.length.at.most', 10)
 
