@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Bug, User, Status, Priority } from '../types';
 import { PRIORITIES } from '../constants';
-import { generateIssueDescription } from '../services/geminiService';
 import toast from 'react-hot-toast';
 
 interface IssueModalProps {
@@ -16,7 +15,6 @@ interface IssueModalProps {
 
 const IssueModal: React.FC<IssueModalProps> = ({ isOpen, onClose, issue, users, onSave, onDelete, projectId }) => {
   const [editableBug, setEditableBug] = useState<Partial<Bug>>({});
-  const [isGenerating, setIsGenerating] = useState(false);
 
   useEffect(() => {
     if (issue) {
@@ -41,13 +39,6 @@ const IssueModal: React.FC<IssueModalProps> = ({ isOpen, onClose, issue, users, 
     setEditableBug(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleAiGenerate = async () => {
-    if (!editableBug.Title) return;
-    setIsGenerating(true);
-    const description = await generateIssueDescription(editableBug.Title);
-    setEditableBug(prev => ({ ...prev, Description: description }));
-    setIsGenerating(false);
-  };
 
   const handleSave = async () => {
     if (!editableBug.Title?.trim()) {
@@ -107,17 +98,7 @@ const IssueModal: React.FC<IssueModalProps> = ({ isOpen, onClose, issue, users, 
           </div>
 
           <div>
-            <div className="flex justify-between items-end mb-2">
-                <label className="block text-xs font-mono font-bold text-primary uppercase tracking-wider">Description</label>
-                <button
-                    onClick={handleAiGenerate}
-                    disabled={isGenerating || !editableBug.Title}
-                    className="text-xs flex items-center gap-1 text-accent hover:text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                >
-                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    {isGenerating ? 'GENERATING...' : 'AI_GENERATE'}
-                </button>
-            </div>
+            <label className="block text-xs font-mono font-bold text-primary mb-2 uppercase tracking-wider">Description</label>
             <textarea
                 name="Description"
                 value={editableBug.Description || ''}
