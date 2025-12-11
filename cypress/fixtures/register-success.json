@@ -1,0 +1,9 @@
+{
+  "user": {
+    "UserID": 2,
+    "Username": "newuser",
+    "Email": "newuser@example.com",
+    "Role": "User"
+  },
+  "token": "mock-registration-jwt-token"
+}
