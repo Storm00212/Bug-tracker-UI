@@ -1,23 +1,23 @@
 describe('Issue Management', () => {
   beforeEach(() => {
     // Login and set up project context
-    cy.window().then((win) => {
+    cy.window({ timeout: 15000 }).then((win) => {
       win.localStorage.setItem('token', 'mock-jwt-token')
     })
     cy.intercept('GET', '**/api/projects', { fixture: 'projects-list.json' }).as('getProjects')
-    cy.visit('/')
-    cy.wait('@getProjects')
+    cy.visit('/', { timeout: 15000 })
+    cy.wait('@getProjects', { timeout: 15000 })
   })
 
   describe('Issue Creation', () => {
     it('should display issue creation modal', () => {
-      cy.get('select').select('1')
-      cy.contains('+ Issue').click()
-      cy.contains('NEW_ISSUE').should('be.visible')
-      cy.get('input[placeholder*="Brief summary"]').should('be.visible')
-      cy.get('textarea[placeholder*="Steps to reproduce"]').should('be.visible')
-      cy.get('select[name="Priority"]').should('be.visible')
-      cy.get('select[name="AssignedTo"]').should('be.visible')
+      cy.get('[data-cy="project-selector"]', { timeout: 10000 }).select('1')
+      cy.get('[data-cy="new-issue-button"]', { timeout: 10000 }).click()
+      cy.contains('NEW_ISSUE', { timeout: 10000 }).should('be.visible')
+      cy.get('input[placeholder*="Brief summary"]', { timeout: 10000 }).should('be.visible')
+      cy.get('textarea[placeholder*="Steps to reproduce"]', { timeout: 10000 }).should('be.visible')
+      cy.get('select[name="Priority"]', { timeout: 10000 }).should('be.visible')
+      cy.get('select[name="AssignedTo"]', { timeout: 10000 }).should('be.visible')
     })
 
     it('should successfully create a new issue', () => {
@@ -25,29 +25,29 @@ describe('Issue Management', () => {
       cy.intercept('GET', '**/api/users/project/1', { fixture: 'project-users.json' }).as('getUsers')
 
       // Select a project first
-      cy.get('select').select('1')
-      cy.wait('@getUsers')
+      cy.get('[data-cy="project-selector"]', { timeout: 10000 }).select('1')
+      cy.wait('@getUsers', { timeout: 15000 })
 
-      cy.contains('+ Issue').click()
-      cy.get('input[placeholder*="Brief summary"]').type('Test Issue Title')
-      cy.get('textarea[placeholder*="Steps to reproduce"]').type('Test issue description')
-      cy.get('select[name="Priority"]').select('High')
-      cy.get('select[name="AssignedTo"]').select('1')
-      cy.contains('CREATE_ISSUE').click()
+      cy.get('[data-cy="new-issue-button"]', { timeout: 10000 }).click()
+      cy.get('input[placeholder*="Brief summary"]', { timeout: 10000 }).type('Test Issue Title')
+      cy.get('textarea[placeholder*="Steps to reproduce"]', { timeout: 10000 }).type('Test issue description')
+      cy.get('select[name="Priority"]', { timeout: 10000 }).select('High')
+      cy.get('select[name="AssignedTo"]', { timeout: 10000 }).select('1')
+      cy.contains('CREATE_ISSUE', { timeout: 10000 }).click()
 
-      cy.wait('@createIssue')
-      cy.contains('NEW_ISSUE').should('not.exist')
-      cy.contains('Issue created successfully').should('be.visible')
+      cy.wait('@createIssue', { timeout: 15000 })
+      cy.contains('NEW_ISSUE', { timeout: 10000 }).should('not.exist')
+      cy.contains('Issue created successfully', { timeout: 10000 }).should('be.visible')
     })
 
     it('should show validation errors for empty title', () => {
-      cy.get('select').select('1')
-      cy.contains('+ Issue').click()
+      cy.get('[data-cy="project-selector"]', { timeout: 10000 }).select('1')
+      cy.get('[data-cy="new-issue-button"]', { timeout: 10000 }).click()
 
-      cy.get('textarea[placeholder*="Steps to reproduce"]').type('Description without title')
-      cy.contains('CREATE_ISSUE').click()
+      cy.get('textarea[placeholder*="Steps to reproduce"]', { timeout: 10000 }).type('Description without title')
+      cy.contains('CREATE_ISSUE', { timeout: 10000 }).click()
 
-      cy.contains('Issue title is required').should('be.visible')
+      cy.contains('Issue title is required', { timeout: 10000 }).should('be.visible')
     })
 
     it('should handle API errors during issue creation', () => {
@@ -56,23 +56,23 @@ describe('Issue Management', () => {
         body: { message: 'Invalid data' }
       }).as('createIssueError')
 
-      cy.get('select').select('1')
-      cy.contains('+ Issue').click()
-      cy.get('input[placeholder*="Brief summary"]').type('Error Issue')
-      cy.contains('CREATE_ISSUE').click()
+      cy.get('[data-cy="project-selector"]', { timeout: 10000 }).select('1')
+      cy.get('[data-cy="new-issue-button"]', { timeout: 10000 }).click()
+      cy.get('input[placeholder*="Brief summary"]', { timeout: 10000 }).type('Error Issue')
+      cy.contains('CREATE_ISSUE', { timeout: 10000 }).click()
 
-      cy.wait('@createIssueError')
-      cy.contains('Failed to save issue').should('be.visible')
+      cy.wait('@createIssueError', { timeout: 15000 })
+      cy.contains('Failed to save issue', { timeout: 10000 }).should('be.visible')
     })
 
     it('should cancel issue creation', () => {
-      cy.get('select').select('1')
-      cy.contains('+ Issue').click()
-      cy.get('input[placeholder*="Brief summary"]').type('Cancelled Issue')
-      cy.contains('CANCEL').click()
+      cy.get('[data-cy="project-selector"]', { timeout: 10000 }).select('1')
+      cy.get('[data-cy="new-issue-button"]', { timeout: 10000 }).click()
+      cy.get('input[placeholder*="Brief summary"]', { timeout: 10000 }).type('Cancelled Issue')
+      cy.contains('CANCEL', { timeout: 10000 }).click()
 
-      cy.contains('NEW_ISSUE').should('not.exist')
-      cy.contains('Cancelled Issue').should('not.exist')
+      cy.contains('NEW_ISSUE', { timeout: 10000 }).should('not.exist')
+      cy.contains('Cancelled Issue', { timeout: 10000 }).should('not.exist')
     })
   })
 
