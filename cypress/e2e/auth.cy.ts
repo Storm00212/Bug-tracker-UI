@@ -39,7 +39,7 @@ describe('Authentication', () => {
       cy.get('[data-cy="login-submit-button"]').click()
 
       cy.wait('@loginRequest')
-      cy.contains('Welcome back').should('be.visible')
+      cy.contains('Welcome back, testuser').should('be.visible')
     })
 
     it('should handle network errors during login', () => {
@@ -105,7 +105,7 @@ describe('Authentication', () => {
 
       cy.visit('/')
       // Should automatically show dashboard without login form
-      cy.contains('Welcome back').should('be.visible')
+      cy.contains('Welcome back, testuser').should('be.visible')
     })
 
     it('should handle expired tokens', () => {
@@ -131,7 +131,7 @@ describe('Authentication', () => {
       })
 
       cy.visit('/')
-      cy.contains('Welcome back').should('be.visible')
+      cy.contains('Welcome back, testuser').should('be.visible')
 
       // Click logout
       cy.get('[data-cy="logout-button"]').click()
