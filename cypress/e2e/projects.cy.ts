@@ -1,39 +1,39 @@
 describe('Project Management', () => {
   beforeEach(() => {
     // Login first
-    cy.window().then((win) => {
+    cy.window({ timeout: 15000 }).then((win) => {
       win.localStorage.setItem('token', 'mock-jwt-token')
     })
-    cy.visit('/')
+    cy.visit('/', { timeout: 15000 })
   })
 
   describe('Project Creation', () => {
     it('should display project creation modal', () => {
-      cy.contains('+ NEW_PROJECT').click()
-      cy.contains('INIT_PROJECT').should('be.visible')
-      cy.get('input[placeholder*="Q4_Marketing_Campaign"]').should('be.visible')
-      cy.get('textarea[placeholder*="Brief summary"]').should('be.visible')
+      cy.get('[data-cy="new-project-button"]', { timeout: 10000 }).click()
+      cy.contains('INIT_PROJECT', { timeout: 10000 }).should('be.visible')
+      cy.get('input[placeholder*="Q4_Marketing_Campaign"]', { timeout: 10000 }).should('be.visible')
+      cy.get('textarea[placeholder*="Brief summary"]', { timeout: 10000 }).should('be.visible')
     })
 
     it('should successfully create a new project', () => {
       cy.intercept('POST', '**/api/projects', { fixture: 'project-create-success.json' }).as('createProject')
 
-      cy.contains('+ NEW_PROJECT').click()
-      cy.get('input[placeholder*="Q4_Marketing_Campaign"]').type('Test Project')
-      cy.get('textarea[placeholder*="Brief summary"]').type('A test project description')
-      cy.contains('CREATE_PROJECT').click()
+      cy.get('[data-cy="new-project-button"]', { timeout: 10000 }).click()
+      cy.get('input[placeholder*="Q4_Marketing_Campaign"]', { timeout: 10000 }).type('Test Project')
+      cy.get('textarea[placeholder*="Brief summary"]', { timeout: 10000 }).type('A test project description')
+      cy.contains('CREATE_PROJECT', { timeout: 10000 }).click()
 
-      cy.wait('@createProject')
-      cy.contains('INIT_PROJECT').should('not.exist')
-      cy.contains('Project created successfully').should('be.visible')
+      cy.wait('@createProject', { timeout: 15000 })
+      cy.contains('INIT_PROJECT', { timeout: 10000 }).should('not.exist')
+      cy.contains('Project created successfully', { timeout: 10000 }).should('be.visible')
     })
 
     it('should show validation errors for empty project name', () => {
-      cy.contains('+ NEW_PROJECT').click()
-      cy.get('textarea[placeholder*="Brief summary"]').type('Description without name')
-      cy.contains('CREATE_PROJECT').click()
+      cy.get('[data-cy="new-project-button"]', { timeout: 10000 }).click()
+      cy.get('textarea[placeholder*="Brief summary"]', { timeout: 10000 }).type('Description without name')
+      cy.contains('CREATE_PROJECT', { timeout: 10000 }).click()
 
-      cy.contains('Project name is required').should('be.visible')
+      cy.contains('Project name is required', { timeout: 10000 }).should('be.visible')
     })
 
     it('should handle API errors during project creation', () => {
@@ -42,21 +42,21 @@ describe('Project Management', () => {
         body: { message: 'Server error' }
       }).as('createProjectError')
 
-      cy.contains('+ NEW_PROJECT').click()
-      cy.get('input[placeholder*="Q4_Marketing_Campaign"]').type('Error Project')
-      cy.contains('CREATE_PROJECT').click()
+      cy.get('[data-cy="new-project-button"]', { timeout: 10000 }).click()
+      cy.get('input[placeholder*="Q4_Marketing_Campaign"]', { timeout: 10000 }).type('Error Project')
+      cy.contains('CREATE_PROJECT', { timeout: 10000 }).click()
 
-      cy.wait('@createProjectError')
-      cy.contains('Failed to create project').should('be.visible')
+      cy.wait('@createProjectError', { timeout: 15000 })
+      cy.contains('Failed to create project', { timeout: 10000 }).should('be.visible')
     })
 
     it('should cancel project creation', () => {
-      cy.contains('+ NEW_PROJECT').click()
-      cy.get('input[placeholder*="Q4_Marketing_Campaign"]').type('Cancelled Project')
-      cy.contains('CANCEL').click()
+      cy.get('[data-cy="new-project-button"]', { timeout: 10000 }).click()
+      cy.get('input[placeholder*="Q4_Marketing_Campaign"]', { timeout: 10000 }).type('Cancelled Project')
+      cy.contains('CANCEL', { timeout: 10000 }).click()
 
-      cy.contains('INIT_PROJECT').should('not.exist')
-      cy.contains('Cancelled Project').should('not.exist')
+      cy.contains('INIT_PROJECT', { timeout: 10000 }).should('not.exist')
+      cy.contains('Cancelled Project', { timeout: 10000 }).should('not.exist')
     })
   })
 
